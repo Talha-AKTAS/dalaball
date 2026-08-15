@@ -8217,8 +8217,19 @@
 ["Suat Serdar","Almanya","Orta Saha",1997,"1. FSV Mainz 05","Bundesliga","2020'ler"]
   ].map(function(r){ return { ad:r[0], ulke:r[1], mevki:r[2], dogum:r[3], takim:r[4], lig:r[5], donem:r[6] }; });
 
+  // Çift uyruklularda Wikidata iki ülkeyi de kaydediyor ve seçim rastgele olabiliyor.
+  // Futbolda doğru ölçüt hangi millî takımda oynadığı — emin olunan isimler burada düzeltiliyor.
+  var ULKE_DUZELT = {
+    "Mesut Özil":"Almanya",        // Almanya millî takımı
+    "Emre Can":"Almanya",          // Almanya millî takımı
+    "Ferdi Kadıoğlu":"Türkiye"     // Türkiye millî takımı (kayıtta "Kanada" görünüyordu)
+  };
+
   var YIL=new Date().getFullYear();
-  [P_SL, P_D].forEach(function(L){ L.forEach(function(p){ p.yas = YIL - p.dogum; }); });
+  [P_SL, P_D].forEach(function(L){ L.forEach(function(p){
+    p.yas = YIL - p.dogum;
+    if(ULKE_DUZELT[p.ad]) p.ulke = ULKE_DUZELT[p.ad];
+  }); });
 
   // Havuzun ilk bloğu iyi bilinen isimler; sonrası kadro derinliği.
   // Günlük seçim ağırlıklı: 4 günün 3'ü tanınmış isimden gelir.
