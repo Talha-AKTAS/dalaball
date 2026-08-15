@@ -12,7 +12,7 @@
 <meta name="referrer" content="no-referrer">
 <meta name="description" content="Süper Lig teknik direktör ve başkanlarının görev süresi canlı sayaç. Bahissiz, reklamsız.">
 <title>DOKSAN — Koltuk Sayacı & Günlük Futbol Bilmecesi</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%BD%3C/text%3E%3C/svg%3E">
 
 <style>
   :root {
@@ -112,19 +112,23 @@
   .stat .v { font-family: var(--mono); font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--flood); }
   .stat .v small { font-size: 10.5px; color: var(--ink-2); font-weight: 400; }
 
-  .leader {
-    margin: 16px 0 12px; padding: 16px;
+  .record {
+    margin: 16px 0 12px; padding: 15px 16px;
     background: linear-gradient(180deg, rgba(242,163,60,.10), transparent);
     border: 1px solid rgba(242,163,60,.28); border-radius: 3px;
-    display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; align-items: center;
   }
-  .leader > svg { grid-row: span 2; align-self: start; }
-  .leader .who { min-width: 0; }
-  .leader .who .nm { font-size: clamp(18px, 5vw, 21px); font-weight: 700; line-height: 1.2; margin-top: 5px; }
-  .leader .who .cl { font-family: var(--mono); font-size: 10.5px; letter-spacing: .05em; color: var(--ink-2); text-transform: uppercase; line-height: 1.4; }
-  .leader .tick { grid-column: 2; text-align: left; }
-  .leader .tick .big { font-size: clamp(16px, 4.4vw, 19px); }
-  .leader .tick .small { font-size: clamp(14px, 4vw, 16px); }
+  .record .hd { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
+  .record .crown { font-size: 15px; line-height: 1; }
+  .record .txt { font-size: 14px; color: var(--ink-2); line-height: 1.45; }
+  .record .txt b { color: var(--ink); font-weight: 700; }
+  .record .txt .sure { color: var(--flood); font-family: var(--mono); font-weight: 600; white-space: nowrap; }
+  .bar { margin-top: 11px; height: 6px; background: var(--ground-2); border: 1px solid var(--line-soft); border-radius: 999px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; background: var(--flood); border-radius: 999px; transition: width .6s ease; }
+  .record .gap {
+    margin-top: 8px; font-family: var(--mono); font-size: 11px; letter-spacing: .03em;
+    color: var(--muted); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  }
+  .record .gap b { color: var(--flood); font-weight: 600; }
 
   ol.board-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
 
@@ -237,9 +241,6 @@
     .tick .big { font-size: 14px; }
     .tick .small { font-size: 13px; }
 
-    .leader { grid-template-columns: auto 1fr; }
-    .leader .tick { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-
     .versus { grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px; }
     .versus .mid { grid-column: 1 / -1; order: -1; text-align: center; font-size: 9.5px; }
 
@@ -280,8 +281,8 @@
       <button type="button" aria-pressed="false" data-role="bk">Başkanlar</button>
     </div>
 
+    <div class="record" id="record"></div>
     <div class="stats" id="stats"></div>
-    <div class="leader" id="leader"></div>
     <ol class="board-list" id="list"></ol>
     <div id="tailBox"></div>
 
@@ -360,7 +361,8 @@
   };
 
   var TD = [
-    { ad:"Okan Buruk",        kulup:"Galatasaray",     bas:"2022-06-23", h:"gun", yuz:{sac:"#1E1712",stil:"kisa"} },
+    { ad:"Okan Buruk",        kulup:"Galatasaray",     bas:"2022-06-23", h:"gun", yuz:{sac:"#1E1712",stil:"kisa"},
+      not:"Galatasaray'da <em>tek dönem rekoru</em> — Fatih Terim'in 1.480 gününü geçti" },
     { ad:"Stanimir Stoilov",  kulup:"Göztepe",         bas:"2023-11-21", h:"gun", yuz:{sac:"#8C8C8C",stil:"seyrek",ten:"#EFC49F"} },
     { ad:"Fatih Tekke",       kulup:"Trabzonspor",     bas:"2025-03-11", h:"gun", yuz:{sac:"#241C15",stil:"kisa",sakal:1} },
     { ad:"João Pereira",      kulup:"Alanyaspor",      bas:"2025-03-22", h:"gun", yuz:{sac:"#231A12",stil:"kisa",sakal:1} },
@@ -407,6 +409,14 @@
     { ad:"Savaş Balçık",     kulup:"Çorum FK",        bas:"2026-07-01", h:"ay",  yuz:{sac:"#3A322A",stil:"kisa"} }
   ];
 
+  /* Tüm zamanların rekorları — aralıksız tek dönem */
+  var REKOR = {
+    td: { ad:"Gordon Milne", kulup:"Beşiktaş", donem:"1987-1994", sure:"6 yıl 6 ay", gun:2374,
+          aciklama:"Süper Lig tarihinde aynı takımı aralıksız en uzun süre çalıştıran teknik direktör" },
+    bk: { ad:"Aziz Yıldırım", kulup:"Fenerbahçe", donem:"1998-2018", sure:"20 yıl", gun:7305,
+          aciklama:"Türk futbolunda bir kulübü aralıksız en uzun süre yöneten başkan" }
+  };
+
   var BK_TARIHSIZ = [
     { ad:"Haydar Arda Çakmak", kulup:"Gençlerbirliği",
       not:"25.07.2026'da <em>yeniden</em> seçildi — ilk dönem başlangıcı doğrulanamadı" },
@@ -421,7 +431,7 @@
     return h;
   }
 
-  function yuzSVG(kisi, boyut) {
+  function yuzSVG(kisi, boyut, tac) {
     var y = kisi.yuz || {};
     var ten  = y.ten || "#E3B189";
     var sac  = y.sac || "#2B2118";
@@ -456,6 +466,16 @@
         '<path d="M25 35 q7 7 14 0" stroke="#241A12" stroke-width="2" fill="none" stroke-linecap="round"/>' +
       '</g>' +
       '<circle cx="32" cy="32" r="31" fill="none" stroke="rgba(0,0,0,.28)" stroke-width="2"/>' +
+      (tac
+        ? '<g>' +
+            '<path d="M23 15.5 L23 5.5 L28 10 L32 3 L36 10 L41 5.5 L41 15.5 Z" ' +
+              'fill="#FBB800" stroke="#7A4E00" stroke-width="1.1" stroke-linejoin="round"/>' +
+            '<rect x="23" y="14" width="18" height="2.6" rx="1" fill="#E09400" stroke="#7A4E00" stroke-width=".8"/>' +
+            '<circle cx="23" cy="5.5" r="1.5" fill="#FFDA7A" stroke="#7A4E00" stroke-width=".7"/>' +
+            '<circle cx="32" cy="3"   r="1.7" fill="#FFDA7A" stroke="#7A4E00" stroke-width=".7"/>' +
+            '<circle cx="41" cy="5.5" r="1.5" fill="#FFDA7A" stroke="#7A4E00" stroke-width=".7"/>' +
+          '</g>'
+        : '') +
     '</svg>';
   }
 
@@ -497,7 +517,7 @@
   }
 
   var listEl   = document.getElementById("list");
-  var leaderEl = document.getElementById("leader");
+  var recordEl = document.getElementById("record");
   var statsEl  = document.getElementById("stats");
   var tailEl   = document.getElementById("tailBox");
   var titleEl  = document.getElementById("boardTitle");
@@ -551,15 +571,26 @@
       kutu("1 yıldan yeni", gunler.filter(function (g) { return g < 365; }).length, birim) +
       kutu("6 aydan yeni", gunler.filter(function (g) { return g < 183; }).length, birim);
 
+    // tüm zamanların rekoru + zirvedekinin rekora uzaklığı
+    var R = REKOR[rol];
     var L = aktif[0];
-    leaderEl.innerHTML =
-      yuzSVG(L, 56) +
-      '<div class="who">' +
-        '<span class="chip">En uzun süredir görevde</span>' +
-        '<div class="nm">' + L.ad + '</div>' +
-        '<div class="cl">' + L.kulup + ' · ' + tarihEtiket(L) + '</div>' +
-      '</div>' +
-      '<div class="tick"><span class="big"></span><span class="small"></span></div>';
+    var lider = gunler[0];
+    var yuzde = Math.min(100, Math.round(lider / R.gun * 1000) / 10);
+    var kalan = Math.max(0, R.gun - lider);
+    var kalanYil = Math.floor(kalan / 365);
+    var kalanAy  = Math.round((kalan % 365) / 30.44);
+    var kalanTxt = kalan === 0 ? "rekor kırıldı"
+                 : (kalanYil ? kalanYil + " yıl " : "") + kalanAy + " ay";
+
+    recordEl.innerHTML =
+      '<div class="hd"><span class="crown">👑</span><span class="chip">Tüm zamanların rekoru</span></div>' +
+      '<div class="txt"><b>' + R.ad + '</b> — ' + R.kulup + ", aralıksız <span class='sure'>" + R.sure +
+        "</span> (" + R.donem + ")<br>" + R.aciklama + '.</div>' +
+      '<div class="bar"><i style="width:' + yuzde + '%"></i></div>' +
+      '<div class="gap">' +
+        '<span>Zirvedeki: <b>' + L.ad + '</b> · rekorun %' + yuzde.toLocaleString("tr-TR") + "'i</span>" +
+        '<span>Rekora kalan: <b>' + kalanTxt + '</b></span>' +
+      '</div>';
 
     listEl.innerHTML = "";
     aktif.forEach(function (k, i) {
@@ -567,7 +598,7 @@
       li.className = "person" + (i === 0 ? " top" : "");
       li.innerHTML =
         '<span class="rank">' + (i + 1) + '</span>' +
-        yuzSVG(k, 42) +
+        yuzSVG(k, 42, i === 0) +
         '<div class="who">' +
           '<div class="nm">' + k.ad + (k.h === "gun" ? "" : ' <span class="chip soft">yaklaşık</span>') + '</div>' +
           '<div class="cl">' + k.kulup + ' · ' + tarihEtiket(k) + '</div>' +
@@ -600,12 +631,6 @@
 
   function tikla() {
     var now = new Date();
-    var L = aktif[0];
-    var lt = leaderEl.querySelector(".tick");
-    if (lt) {
-      lt.querySelector(".big").textContent = sureMetni(L, now);
-      lt.querySelector(".small").textContent = saatKismi(L.basDate, now);
-    }
     listEl.querySelectorAll("li.person").forEach(function (li) {
       var k = aktif[+li.dataset.idx];
       li.querySelector(".tick .big").textContent = sureMetni(k, now);
