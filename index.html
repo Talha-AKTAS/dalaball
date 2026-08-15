@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B1210">
+<meta name="description" content="Süper Lig teknik direktör ve başkanlarının görev süresi canlı sayaç. Bahissiz, reklamsız.">
+<title>DOKSAN — Koltuk Sayacı & Günlük Futbol Bilmecesi</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
+
+<style>
+  :root {
+    --ground:     #0B1210;
+    --ground-2:   #101A17;
+    --surface:    #16211D;
+    --surface-2:  #1C2A25;
+    --line:       #263630;
+    --line-soft:  #1E2C27;
+    --ink:        #E9F0EB;
+    --ink-2:      #B4C4BB;
+    --muted:      #7C8F86;
+    --flood:      #F2A33C;
+    --hit:        #2E9E63;
+    --near:       #C9962B;
+    --miss:       #26332F;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --pad: clamp(14px, 4vw, 32px);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: var(--sans); font-size: 16px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: ""; position: fixed; inset: 0 0 auto 0; height: 380px;
+    background: radial-gradient(120% 100% at 50% 0%, rgba(242,163,60,.10), transparent 70%);
+    pointer-events: none; z-index: 0;
+  }
+  .wrap {
+    position: relative; z-index: 1; max-width: 960px; margin: 0 auto;
+    padding: 0 var(--pad) 64px;
+    padding-left: max(var(--pad), env(safe-area-inset-left));
+    padding-right: max(var(--pad), env(safe-area-inset-right));
+  }
+
+  header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; padding: 24px 0 16px; border-bottom: 1px solid var(--line); }
+  .brand { font-size: clamp(28px, 9vw, 44px); font-weight: 800; letter-spacing: -.03em; line-height: 1; margin: 0; text-transform: uppercase; }
+  .brand span { color: var(--flood); }
+  .tagline { font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+
+  nav { display: flex; gap: 4px; margin: 16px 0 22px; padding: 4px; background: var(--ground-2); border: 1px solid var(--line-soft); border-radius: 3px; }
+  nav button {
+    flex: 1; appearance: none; background: transparent; border: 0; color: var(--muted);
+    font-family: var(--mono); font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase;
+    padding: 13px 6px; border-radius: 2px; cursor: pointer; transition: color .15s, background .15s;
+    min-height: 44px;
+  }
+  nav button:hover { color: var(--ink-2); }
+  nav button[aria-selected="true"] { background: var(--flood); color: #171104; font-weight: 700; }
+  nav button:focus-visible { outline: 2px solid var(--flood); outline-offset: 2px; }
+  .panel[hidden] { display: none; }
+
+  .eyebrow { font-family: var(--mono); font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
+  h2 { font-size: clamp(19px, 5vw, 22px); font-weight: 700; letter-spacing: -.01em; margin: 0 0 6px; text-wrap: balance; }
+  .note { color: var(--ink-2); font-size: 14px; margin: 0; max-width: 66ch; }
+
+  .chip {
+    display: inline-block; font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em;
+    text-transform: uppercase; padding: 3px 7px; border-radius: 2px; white-space: nowrap;
+    background: rgba(242,163,60,.13); color: var(--flood); border: 1px solid rgba(242,163,60,.3);
+    vertical-align: 2px;
+  }
+  .chip.soft { background: rgba(124,143,134,.12); color: var(--muted); border-color: rgba(124,143,134,.28); }
+  .chip.warn { background: rgba(201,150,43,.14); color: var(--near); border-color: rgba(201,150,43,.35); }
+
+  .versus {
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px;
+    margin: 20px 0 4px; padding: 15px 16px;
+    background: var(--ground-2); border: 1px solid var(--line); border-radius: 3px;
+  }
+  .versus .side { text-align: center; min-width: 0; }
+  .versus .side .k { font-family: var(--mono); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); display: block; }
+  .versus .side .v { font-family: var(--mono); font-size: clamp(19px, 6vw, 28px); font-weight: 700; font-variant-numeric: tabular-nums; color: var(--flood); line-height: 1.25; }
+  .versus .side .v small { font-size: 11.5px; color: var(--ink-2); font-weight: 400; }
+  .versus .mid { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; }
+
+  .roles { display: flex; gap: 6px; margin: 18px 0 4px; }
+  .roles button {
+    flex: 1; appearance: none; background: var(--surface); border: 1px solid var(--line);
+    color: var(--ink-2); font-family: var(--sans); font-size: 14px; font-weight: 600;
+    padding: 11px 12px; border-radius: 999px; cursor: pointer; min-height: 44px;
+  }
+  .roles button[aria-pressed="true"] { background: var(--flood); border-color: var(--flood); color: #171104; }
+  .roles button:focus-visible { outline: 2px solid var(--flood); outline-offset: 2px; }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 7px; margin: 16px 0 6px; }
+  .stat { background: var(--surface); border: 1px solid var(--line-soft); border-radius: 3px; padding: 12px 14px; }
+  .stat .k { font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 5px; }
+  .stat .v { font-family: var(--mono); font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--flood); }
+  .stat .v small { font-size: 10.5px; color: var(--ink-2); font-weight: 400; }
+
+  .leader {
+    margin: 16px 0 12px; padding: 16px;
+    background: linear-gradient(180deg, rgba(242,163,60,.10), transparent);
+    border: 1px solid rgba(242,163,60,.28); border-radius: 3px;
+    display: grid; grid-template-columns: auto 1fr; gap: 8px 14px; align-items: center;
+  }
+  .leader > svg { grid-row: span 2; align-self: start; }
+  .leader .who { min-width: 0; }
+  .leader .who .nm { font-size: clamp(18px, 5vw, 21px); font-weight: 700; line-height: 1.2; margin-top: 5px; }
+  .leader .who .cl { font-family: var(--mono); font-size: 10.5px; letter-spacing: .05em; color: var(--ink-2); text-transform: uppercase; line-height: 1.4; }
+  .leader .tick { grid-column: 2; text-align: left; }
+  .leader .tick .big { font-size: clamp(16px, 4.4vw, 19px); }
+  .leader .tick .small { font-size: clamp(14px, 4vw, 16px); }
+
+  ol.board-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+
+  li.person {
+    display: grid;
+    grid-template-columns: 26px 44px 1fr auto;
+    grid-template-areas: "rank ava who tick";
+    align-items: center; gap: 10px;
+    background: var(--surface); border: 1px solid var(--line-soft); border-radius: 3px;
+    padding: 10px 13px;
+  }
+  li.person.top { border-color: rgba(242,163,60,.35); }
+  li.person.nodate { opacity: .82; }
+  li.person > .rank { grid-area: rank; }
+  li.person > svg    { grid-area: ava; }
+  li.person > .who   { grid-area: who; }
+  li.person > .tick  { grid-area: tick; }
+
+  .rank { font-family: var(--mono); font-size: 13.5px; font-variant-numeric: tabular-nums; color: var(--muted); text-align: right; }
+  li.person.top .rank { color: var(--flood); font-weight: 700; }
+
+  .who { min-width: 0; }
+  .who .nm { font-size: 15px; font-weight: 600; line-height: 1.3; }
+  .who .cl { font-family: var(--mono); font-size: 10.5px; letter-spacing: .04em; color: var(--muted); text-transform: uppercase; line-height: 1.45; }
+  .who .sub { font-size: 11.5px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+  .who .sub em { color: var(--ink-2); font-style: normal; font-weight: 600; }
+
+  .tick { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+  .tick .big { font-size: 13.5px; font-weight: 600; color: var(--ink); display: block; }
+  .tick .small { font-size: 12px; color: var(--flood); letter-spacing: .04em; }
+
+  .subhead {
+    margin: 22px 0 8px; font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 10px;
+  }
+  .subhead::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+  .method { margin-top: 20px; background: rgba(242,163,60,.06); border: 1px solid rgba(242,163,60,.22); border-radius: 3px; padding: 15px 16px; font-size: 13px; color: var(--ink-2); }
+  .method b { color: var(--ink); }
+  .method p { margin: 0 0 9px; }
+  .method p:last-child { margin: 0; }
+
+  /* --- bilmece --- */
+  .puz-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  .puz-no { font-family: var(--mono); font-size: 11.5px; color: var(--muted); letter-spacing: .08em; }
+  .board { display: grid; gap: 5px; margin: 16px 0; }
+  .row { display: grid; grid-template-columns: 1.45fr 1fr 1.15fr .62fr; gap: 5px; }
+  .cell {
+    background: var(--surface); border: 1px solid var(--line-soft); border-radius: 2px;
+    min-height: 56px; padding: 7px 4px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center; gap: 2px;
+    overflow: hidden;
+  }
+  .cell .lbl { font-family: var(--mono); font-size: 8.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .55; }
+  .cell .val { font-size: clamp(10.5px, 2.9vw, 13px); font-weight: 600; line-height: 1.15; overflow-wrap: anywhere; }
+  .cell.hit  { background: var(--hit);  border-color: var(--hit);  color: #04150B; }
+  .cell.near { background: var(--near); border-color: var(--near); color: #1A1203; }
+  .cell.miss { background: var(--miss); border-color: var(--miss); color: var(--ink-2); }
+  .cell.flip { animation: flip .45s ease both; }
+  @keyframes flip { 0% { transform: rotateX(-90deg); opacity: 0; } 100% { transform: rotateX(0); opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .cell.flip { animation: none; } }
+  .hdr-row .cell { min-height: 0; background: transparent; border: 0; padding: 0 0 4px; }
+  .hdr-row .cell .lbl { opacity: 1; color: var(--muted); }
+
+  .guess-zone { position: relative; margin-top: 14px; }
+  input[type="text"] {
+    width: 100%; background: var(--ground-2); border: 1px solid var(--line); border-radius: 3px;
+    color: var(--ink); font-family: var(--sans); font-size: 16px; padding: 14px;
+  }
+  input[type="text"]::placeholder { color: var(--muted); }
+  input[type="text"]:focus { outline: 2px solid var(--flood); outline-offset: -1px; border-color: transparent; }
+  .sugg { position: absolute; left: 0; right: 0; top: calc(100% + 4px); background: var(--surface-2); border: 1px solid var(--line); border-radius: 3px; max-height: 46vh; overflow-y: auto; z-index: 5; -webkit-overflow-scrolling: touch; }
+  .sugg[hidden] { display: none; }
+  .sugg button { display: block; width: 100%; text-align: left; background: transparent; border: 0; border-bottom: 1px solid var(--line-soft); color: var(--ink); font-family: var(--sans); font-size: 15px; padding: 13px 14px; cursor: pointer; min-height: 46px; }
+  .sugg button:last-child { border-bottom: 0; }
+  .sugg button:hover, .sugg button:focus-visible { background: var(--flood); color: #171104; outline: none; }
+
+  .result { margin-top: 18px; padding: 18px; background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--flood); border-radius: 3px; }
+  .result[hidden] { display: none; }
+  .result h3 { margin: 0 0 4px; font-size: 17px; }
+  .result .answer { font-size: 14px; color: var(--ink-2); margin: 0 0 14px; }
+  pre.share { font-family: var(--mono); font-size: 14px; line-height: 1.45; background: var(--ground); border: 1px solid var(--line-soft); border-radius: 3px; padding: 14px; margin: 0 0 12px; overflow-x: auto; }
+  .btn { appearance: none; background: var(--flood); color: #171104; border: 0; border-radius: 3px; font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 14px 18px; cursor: pointer; min-height: 46px; }
+  .btn:hover { background: #FFBA5C; }
+  .btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .countdown { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: .06em; margin-top: 14px; }
+  .countdown b { color: var(--flood); font-weight: 600; }
+
+  footer { margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
+  footer p { margin: 0 0 8px; max-width: 72ch; }
+  footer strong { color: var(--ink-2); font-weight: 600; }
+
+  /* ================= TELEFON ================= */
+  @media (max-width: 620px) {
+    li.person {
+      grid-template-columns: 24px 42px 1fr;
+      grid-template-areas:
+        "rank ava who"
+        "tick tick tick";
+      gap: 4px 10px;
+      padding: 11px 12px;
+    }
+    li.person > .tick {
+      text-align: left;
+      padding-top: 8px;
+      margin-top: 4px;
+      border-top: 1px solid var(--line-soft);
+      display: flex; align-items: baseline; gap: 9px;
+    }
+    .tick .big { font-size: 14px; }
+    .tick .small { font-size: 13px; }
+
+    .leader { grid-template-columns: auto 1fr; }
+    .leader .tick { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+
+    .versus { grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px; }
+    .versus .mid { grid-column: 1 / -1; order: -1; text-align: center; font-size: 9.5px; }
+
+    .stats { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 390px) {
+    .row { grid-template-columns: 1.35fr 1fr 1.1fr .6fr; gap: 4px; }
+    .cell { min-height: 52px; padding: 6px 2px; }
+    .who .nm { font-size: 14.5px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <h1 class="brand">DOK<span>SAN</span></h1>
+    <p class="tagline">bahissiz · reklamsız · her gün yeni</p>
+  </header>
+
+  <nav role="tablist">
+    <button role="tab" aria-selected="true"  aria-controls="p-board"  id="t-board">Koltuk Sayacı</button>
+    <button role="tab" aria-selected="false" aria-controls="p-puzzle" id="t-puzzle">Günün Bilmecesi</button>
+  </nav>
+
+  <section class="panel" id="p-board" role="tabpanel" aria-labelledby="t-board">
+
+    <p class="eyebrow">Canlı sayaç · Trendyol Süper Lig 2026-27</p>
+    <h2 id="boardTitle">Koltukta kim ne kadar dayandı?</h2>
+    <p class="note" id="boardNote"></p>
+
+    <div class="versus" id="versus"></div>
+
+    <div class="roles">
+      <button type="button" aria-pressed="true"  data-role="td">Teknik Direktörler</button>
+      <button type="button" aria-pressed="false" data-role="bk">Başkanlar</button>
+    </div>
+
+    <div class="stats" id="stats"></div>
+    <div class="leader" id="leader"></div>
+    <ol class="board-list" id="list"></ol>
+    <div id="tailBox"></div>
+
+    <div class="method">
+      <p><b>Sayaç kesintisiz görevi ölçer.</b> Yeniden seçilmek süreyi sıfırlamaz. Serdal Adalı 29.12.2024'te olağanüstü seçimle geldi, Mayıs 2025'te güven tazeledi — sayaç 2024'ten işliyor. Memik Yılmaz 04.02.2023'ten beri görevde; 26.06.2026'da üçüncü kez seçilmesi süreyi bölmez.</p>
+      <p><b>Önceki dönemler ayrı sayılır.</b> Arada başkası oturduysa süre kesilmiştir: Aziz Yıldırım'ın 1998-2018 başkanlığı, 2026'da başlayan dönemiyle aynı sayaca girmez. Bu kişilerin altında önceki dönem ayrıca yazılıdır.</p>
+      <p><b>Tüm sayaçlar saniyesine kadar işler.</b> Göreve başlama günü kesin bilinenler doğrudan o tarihten sayar. Kaynaklarda yalnızca yılı ya da ayı doğrulanabilenler <span class="chip soft">yaklaşık</span> etiketi ve <b>≈</b> işaretiyle gösterilir — sayaç yine çalışır, başlangıç günü tahminîdir, gün netleştikçe güncellenir.</p>
+    </div>
+
+  </section>
+
+  <section class="panel" id="p-puzzle" role="tabpanel" aria-labelledby="t-puzzle" hidden>
+    <div class="puz-head">
+      <div>
+        <p class="eyebrow">Efsaneler modu</p>
+        <h2>Bugünün futbolcusunu bul</h2>
+        <p class="note">6 hakkın var. Her tahminden sonra kutular renk verir: <b style="color:var(--hit)">yeşil</b> tam isabet, <b style="color:var(--near)">sarı</b> yakın, gri uzak. Yaş için ok yönüne bak.</p>
+      </div>
+      <div class="puz-no" id="puzNo">BİLMECE #—</div>
+    </div>
+
+    <div class="board" id="board">
+      <div class="row hdr-row">
+        <div class="cell"><span class="lbl">Takım</span></div>
+        <div class="cell"><span class="lbl">Ülke</span></div>
+        <div class="cell"><span class="lbl">Mevki</span></div>
+        <div class="cell"><span class="lbl">Yaş</span></div>
+      </div>
+    </div>
+
+    <div class="guess-zone" id="guessZone">
+      <input type="text" id="guess" placeholder="Futbolcu adı yaz…" autocomplete="off" autocapitalize="words" aria-label="Futbolcu adı" />
+      <div class="sugg" id="sugg" hidden></div>
+    </div>
+
+    <div class="result" id="result" hidden>
+      <h3 id="resTitle"></h3>
+      <p class="answer" id="resAnswer"></p>
+      <pre class="share" id="shareText"></pre>
+      <button class="btn" id="copyBtn">Sonucu kopyala</button>
+      <div class="countdown">Yeni bilmeceye kalan süre: <b id="cd">--:--:--</b></div>
+    </div>
+  </section>
+
+  <footer>
+    <p><strong>Görseller temsilîdir.</strong> Kişilerin fotoğrafı kullanılmıyor; ajans telifli oldukları için. Her kart, gerçek portre olmayan <em>genel bir çizim</em> ve kişinin kulübünün <em>renklerinden</em> oluşan zemin taşır. Kulüp renkleri korunmuyor, armaları korunuyor — o yüzden arma yok.</p>
+    <p>Bu site hiçbir kulüp, TFF veya lig organizasyonu ile bağlantılı değildir. Bahis içeriği, oran ve yönlendirme <strong>hiçbir koşulda</strong> yer almaz.</p>
+  </footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var RENK = {
+    "Galatasaray":     ["#A90432", "#FBB800"],
+    "Fenerbahçe":      ["#1B458F", "#FFED00"],
+    "Beşiktaş":        ["#111111", "#F5F5F5"],
+    "Trabzonspor":     ["#86123A", "#1D4E9C"],
+    "Başakşehir":      ["#14315C", "#E86A17"],
+    "Samsunspor":      ["#C8102E", "#F5F5F5"],
+    "Konyaspor":       ["#00693E", "#F5F5F5"],
+    "Alanyaspor":      ["#F47B20", "#00693E"],
+    "Çaykur Rizespor": ["#00693E", "#1B458F"],
+    "Gaziantep FK":    ["#C8102E", "#111111"],
+    "Göztepe":         ["#C8102E", "#FBB800"],
+    "Kasımpaşa":       ["#1B458F", "#F5F5F5"],
+    "Kocaelispor":     ["#00693E", "#111111"],
+    "Eyüpspor":        ["#5B2A86", "#FBB800"],
+    "Gençlerbirliği":  ["#C8102E", "#111111"],
+    "Çorum FK":        ["#C8102E", "#F5F5F5"],
+    "Erzurumspor FK":  ["#1B458F", "#F5F5F5"],
+    "Amedspor":        ["#C8102E", "#00693E"]
+  };
+
+  var TD = [
+    { ad:"Okan Buruk",        kulup:"Galatasaray",     bas:"2022-06-23", h:"gun", yuz:{sac:"#1E1712",stil:"kisa"} },
+    { ad:"Stanimir Stoilov",  kulup:"Göztepe",         bas:"2023-11-21", h:"gun", yuz:{sac:"#8C8C8C",stil:"seyrek",ten:"#EFC49F"} },
+    { ad:"Fatih Tekke",       kulup:"Trabzonspor",     bas:"2025-03-11", h:"gun", yuz:{sac:"#241C15",stil:"kisa",sakal:1} },
+    { ad:"João Pereira",      kulup:"Alanyaspor",      bas:"2025-03-22", h:"gun", yuz:{sac:"#231A12",stil:"kisa",sakal:1} },
+    { ad:"Selçuk İnan",       kulup:"Kocaelispor",     bas:"2025-06-03", h:"gun", yuz:{sac:"#1E1712",stil:"kisa",sakal:1} },
+    { ad:"Serkan Özbalta",    kulup:"Erzurumspor FK",  bas:"2025-07-01", h:"gun", yuz:{sac:"#2A211A",stil:"kisa"} },
+    { ad:"Nuri Şahin",        kulup:"Başakşehir",      bas:"2025-09-15", h:"gun", yuz:{sac:"#1E1712",stil:"kisa",sakal:1} },
+    { ad:"Recep Uçar",        kulup:"Çaykur Rizespor", bas:"2025-12-03", h:"gun", yuz:{sac:"#2A211A",stil:"kisa"} },
+    { ad:"Emre Belözoğlu",    kulup:"Kasımpaşa",       bas:"2025-12-05", h:"gun", yuz:{sac:"#1E1712",stil:"kisa"} },
+    { ad:"İlhan Palut",       kulup:"Konyaspor",       bas:"2026-02-06", h:"gun", yuz:{sac:"#2A211A",stil:"kisa",sakal:1},
+      not:"Konyaspor'daki <em>2. dönemi</em> — ilk dönem 2021-2023" },
+    { ad:"Thorsten Fink",     kulup:"Samsunspor",      bas:"2026-02-16", h:"gun", yuz:{sac:"#9A9A96",stil:"kisa",ten:"#F0CDAE"} },
+    { ad:"Uğur Uçar",         kulup:"Çorum FK",        bas:"2026-02-17", h:"gun", yuz:{sac:"#241C15",stil:"kisa",sakal:1} },
+    { ad:"Mirel Rădoi",       kulup:"Gaziantep FK",    bas:"2026-04-22", h:"gun", yuz:{sac:"#241C15",stil:"kisa",ten:"#EFC49F"} },
+    { ad:"Metin Diyadin",     kulup:"Gençlerbirliği",  bas:"2026-05-05", h:"gun", yuz:{sac:"#7E7A74",stil:"seyrek",sakal:1},
+      not:"Aynı kulüpteki <em>3. dönemi</em> — Gençlerbirliği geçen sezon 6 hoca değiştirip rekor kırdı" },
+    { ad:"Vincenzo Italiano", kulup:"Beşiktaş",        bas:"2026-06-05", h:"gun", yuz:{sac:"#2B2119",stil:"kisa",sakal:1,ten:"#EFC49F"} },
+    { ad:"Besnik Hasi",       kulup:"Amedspor",        bas:"2026-06-10", h:"gun", yuz:{sac:"#3A3129",stil:"seyrek",ten:"#EFC49F"} },
+    { ad:"İsmail Kartal",     kulup:"Fenerbahçe",      bas:"2026-06-18", h:"gun", yuz:{sac:"#B9B4AE",stil:"seyrek"} },
+    { ad:"Özhan Pulat",       kulup:"Eyüpspor",        bas:"2026-06-29", h:"gun", yuz:{sac:"#241C15",stil:"kisa",sakal:1} }
+  ];
+
+  var BK = [
+    { ad:"Hasan Çavuşoğlu",  kulup:"Alanyaspor",      bas:"2011-07-01", h:"yil", yuz:{sac:"#9A958E",stil:"seyrek"} },
+    { ad:"Göksel Gümüşdağ",  kulup:"Başakşehir",      bas:"2014-07-01", h:"yil", yuz:{sac:"#3A322A",stil:"kisa"} },
+    { ad:"Yüksel Yıldırım",  kulup:"Samsunspor",      bas:"2018-07-01", h:"yil", yuz:{sac:"#5A524A",stil:"seyrek"} },
+    { ad:"Murat Özkaya",     kulup:"Eyüpspor",        bas:"2019-07-01", h:"yil", yuz:{sac:"#3A322A",stil:"kisa"},
+      not:"Kulüp <em>TMSF kayyum yönetiminde</em> — Özkaya ünvanen başkan" },
+    { ad:"Dursun Özbek",     kulup:"Galatasaray",     bas:"2022-06-11", h:"gun", yuz:{sac:"#C8C4BE",stil:"seyrek"},
+      not:"Önceki dönem <em>2015-2018</em> — ayrı sayılır" },
+    { ad:"Memik Yılmaz",     kulup:"Gaziantep FK",    bas:"2023-02-04", h:"gun", yuz:{sac:"#4A4238",stil:"kisa"},
+      not:"26.06.2026'da <em>3. kez</em> seçildi — sayaç sıfırlanmadı" },
+    { ad:"Ertuğrul Doğan",   kulup:"Trabzonspor",     bas:"2023-03-26", h:"gun", yuz:{sac:"#4A4238",stil:"kisa"},
+      not:"01.12.2024'te yeniden seçildi — sayaç sıfırlanmadı" },
+    { ad:"Recep Durul",      kulup:"Kocaelispor",     bas:"2024-07-01", h:"yil", yuz:{sac:"#5A524A",stil:"kisa"},
+      not:"24.05.2026'da yeniden seçildi — sayaç sıfırlanmadı" },
+    { ad:"Serdal Adalı",     kulup:"Beşiktaş",        bas:"2024-12-29", h:"gun", yuz:{sac:"#6E665C",stil:"seyrek"},
+      not:"Mayıs 2025'te güven tazeledi — sayaç sıfırlanmadı" },
+    { ad:"Ömer Atiker",      kulup:"Konyaspor",       bas:"2025-06-01", h:"ay",  yuz:{sac:"#3A322A",stil:"kisa"} },
+    { ad:"Nahit Eren",       kulup:"Amedspor",        bas:"2025-10-15", h:"ay",  yuz:{sac:"#7E7A74",stil:"seyrek"},
+      not:"01.06.2026'da yeniden seçildi — sayaç sıfırlanmadı" },
+    { ad:"Ali Zeki Saruhan", kulup:"Çaykur Rizespor", bas:"2026-06-04", h:"gun", yuz:{sac:"#4A4238",stil:"kisa"} },
+    { ad:"Aziz Yıldırım",    kulup:"Fenerbahçe",      bas:"2026-06-07", h:"gun", yuz:{sac:"#B0ABA4",stil:"seyrek"},
+      not:"Önceki dönem <em>1998-2018</em> — ayrı sayılır" },
+    { ad:"Savaş Balçık",     kulup:"Çorum FK",        bas:"2026-07-01", h:"ay",  yuz:{sac:"#3A322A",stil:"kisa"} }
+  ];
+
+  var BK_TARIHSIZ = [
+    { ad:"Haydar Arda Çakmak", kulup:"Gençlerbirliği",
+      not:"25.07.2026'da <em>yeniden</em> seçildi — ilk dönem başlangıcı doğrulanamadı" },
+    { ad:"Ahmet Dal",          kulup:"Erzurumspor FK", not:"Mayıs 2026 itibarıyla görevde" },
+    { ad:"Rasmus Ankersen",    kulup:"Göztepe",        not:"Göreve başlama tarihi doğrulanamadı" },
+    { ad:"Davut Dişli",        kulup:"Kasımpaşa",      not:"Kazancı Holding devri sonrası — tarih doğrulanamadı" }
+  ];
+
+  function hashKod(s) {
+    var h = 0, i;
+    for (i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+    return h;
+  }
+
+  function yuzSVG(kisi, boyut) {
+    var y = kisi.yuz || {};
+    var ten  = y.ten || "#E3B189";
+    var sac  = y.sac || "#2B2118";
+    var stil = y.stil || "kisa";
+    var c    = RENK[kisi.kulup] || ["#3A4A44", "#7C8F86"];
+    var id   = "c" + Math.abs(hashKod(kisi.ad + kisi.kulup));
+
+    var sacPath = stil === "kisa"
+      ? '<path d="M17 27 Q17 10 32 10 Q47 10 47 27 Q43 19 32 19 Q21 19 17 27 Z" fill="' + sac + '"/>'
+      : '<path d="M17 29 Q17 14 25 12 Q22 18 21 27 Z" fill="' + sac + '"/>' +
+        '<path d="M47 29 Q47 14 39 12 Q42 18 43 27 Z" fill="' + sac + '"/>' +
+        '<path d="M23.5 15.5 Q32 11.5 40.5 15.5 Q32 13.5 23.5 15.5 Z" fill="' + sac + '" opacity=".75"/>';
+
+    var sakal = y.sakal
+      ? '<path d="M20 33 Q20 47 32 49 Q44 47 44 33 Q41 42 32 42 Q23 42 20 33 Z" fill="' + sac + '" opacity=".85"/>'
+      : '';
+
+    return '<svg viewBox="0 0 64 64" width="' + boyut + '" height="' + boyut + '" aria-hidden="true">' +
+      '<defs><clipPath id="' + id + '"><circle cx="32" cy="32" r="32"/></clipPath></defs>' +
+      '<g clip-path="url(#' + id + ')">' +
+        '<rect width="64" height="64" fill="' + c[0] + '"/>' +
+        '<path d="M0 64 L0 46 Q32 34 64 46 L64 64 Z" fill="' + c[1] + '"/>' +
+        '<path d="M26 40 h12 v10 h-12 z" fill="' + ten + '"/>' +
+        '<circle cx="17" cy="30" r="3.4" fill="' + ten + '"/>' +
+        '<circle cx="47" cy="30" r="3.4" fill="' + ten + '"/>' +
+        '<ellipse cx="32" cy="29" rx="14.5" ry="16" fill="' + ten + '"/>' +
+        sakal + sacPath +
+        '<path d="M24 29 q3.2 -3.4 6.4 0" stroke="#241A12" stroke-width="1.9" fill="none" stroke-linecap="round"/>' +
+        '<path d="M33.6 29 q3.2 -3.4 6.4 0" stroke="#241A12" stroke-width="1.9" fill="none" stroke-linecap="round"/>' +
+        '<path d="M23.5 23.5 q3.5 -2 7 -.4" stroke="' + sac + '" stroke-width="1.7" fill="none" stroke-linecap="round"/>' +
+        '<path d="M33.5 23.1 q3.5 -1.6 7 .4" stroke="' + sac + '" stroke-width="1.7" fill="none" stroke-linecap="round"/>' +
+        '<path d="M25 35 q7 7 14 0" stroke="#241A12" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+      '</g>' +
+      '<circle cx="32" cy="32" r="31" fill="none" stroke="rgba(0,0,0,.28)" stroke-width="2"/>' +
+    '</svg>';
+  }
+
+  function tarih(s) { return new Date(s + "T12:00:00"); }
+
+  function ymd(bas, simdi) {
+    var y = simdi.getFullYear() - bas.getFullYear();
+    var a = simdi.getMonth() - bas.getMonth();
+    var g = simdi.getDate() - bas.getDate();
+    if (g < 0) { a--; g += new Date(simdi.getFullYear(), simdi.getMonth(), 0).getDate(); }
+    if (a < 0) { y--; a += 12; }
+    return { y: y, a: a, g: g };
+  }
+
+  function saatKismi(bas, simdi) {
+    var kalan = (simdi - bas) % 86400000;
+    return String(Math.floor(kalan / 3600000)).padStart(2, "0") + ":" +
+           String(Math.floor(kalan % 3600000 / 60000)).padStart(2, "0") + ":" +
+           String(Math.floor(kalan % 60000 / 1000)).padStart(2, "0");
+  }
+
+  function sureMetni(k, now) {
+    var d = ymd(k.basDate, now), p = [];
+    if (d.y) p.push(d.y + " yıl");
+    if (d.a) p.push(d.a + " ay");
+    p.push(d.g + " gün");
+    return (k.h === "gun" ? "" : "≈ ") + p.join(" ");
+  }
+
+  function trTarih(d) {
+    return String(d.getDate()).padStart(2, "0") + "." +
+           String(d.getMonth() + 1).padStart(2, "0") + "." + d.getFullYear();
+  }
+
+  function tarihEtiket(k) {
+    if (k.h === "gun") return trTarih(k.basDate) + "'ten beri";
+    if (k.h === "ay")  return "≈ " + k.basDate.toLocaleDateString("tr-TR", { month: "long", year: "numeric" }) + "'ten beri";
+    return "≈ " + k.basDate.getFullYear() + "'ten beri";
+  }
+
+  var listEl   = document.getElementById("list");
+  var leaderEl = document.getElementById("leader");
+  var statsEl  = document.getElementById("stats");
+  var tailEl   = document.getElementById("tailBox");
+  var titleEl  = document.getElementById("boardTitle");
+  var noteEl   = document.getElementById("boardNote");
+  var vsEl     = document.getElementById("versus");
+
+  function hazirla(kaynak) {
+    return kaynak.map(function (k) {
+      var o = {}; for (var x in k) o[x] = k[x];
+      o.basDate = tarih(k.bas);
+      return o;
+    }).sort(function (a, b) { return a.basDate - b.basDate; });
+  }
+
+  var TD_S = hazirla(TD), BK_S = hazirla(BK);
+  var aktif = TD_S;
+
+  function gunSayisi(k, now) { return Math.floor((now - k.basDate) / 86400000); }
+
+  (function () {
+    var now = new Date();
+    var ortTD = Math.round(TD_S.reduce(function (a, k) { return a + gunSayisi(k, now); }, 0) / TD_S.length);
+    var ortBK = Math.round(BK_S.reduce(function (a, k) { return a + gunSayisi(k, now); }, 0) / BK_S.length);
+    vsEl.innerHTML =
+      '<div class="side"><span class="k">Hoca ortalaması</span><span class="v">' +
+        ortTD.toLocaleString("tr-TR") + '<small> gün</small></span></div>' +
+      '<div class="mid">karşı</div>' +
+      '<div class="side"><span class="k">Başkan ortalaması</span><span class="v">' +
+        ortBK.toLocaleString("tr-TR") + '<small> gün</small></span></div>';
+  })();
+
+  function kutu(k, v, birim) {
+    return '<div class="stat"><span class="k">' + k + '</span><span class="v">' + v + '<small> ' + birim + '</small></span></div>';
+  }
+
+  function ciz(rol) {
+    aktif = rol === "td" ? TD_S : BK_S;
+    var now = new Date();
+    var gunler = aktif.map(function (k) { return gunSayisi(k, now); });
+    var ort = Math.round(gunler.reduce(function (a, b) { return a + b; }, 0) / gunler.length);
+    var birim = rol === "td" ? "hoca" : "başkan";
+
+    titleEl.textContent = rol === "td" ? "Koltukta kim ne kadar dayandı?" : "Başkanlıkta kim ne kadar dayandı?";
+    noteEl.innerHTML = rol === "td"
+      ? "Süper Lig'in 18 teknik direktörü, en uzun süredir görevde olandan başlayarak. <b>18/18 tarih gün bazında doğrulandı.</b>"
+      : "Kulüp başkanlarının <b>kesintisiz</b> görev süresi — yeniden seçilmek sayacı sıfırlamaz. <b>18/18 başkan bulundu</b>, 14'ünün başlangıcı tarihlendirilebildi.";
+
+    statsEl.innerHTML =
+      kutu("En uzun süredir görevde", gunler[0].toLocaleString("tr-TR"), "gün") +
+      kutu("Ortalama görev süresi", ort.toLocaleString("tr-TR"), "gün") +
+      kutu("1 yıldan yeni", gunler.filter(function (g) { return g < 365; }).length, birim) +
+      kutu("6 aydan yeni", gunler.filter(function (g) { return g < 183; }).length, birim);
+
+    var L = aktif[0];
+    leaderEl.innerHTML =
+      yuzSVG(L, 56) +
+      '<div class="who">' +
+        '<span class="chip">En uzun süredir görevde</span>' +
+        '<div class="nm">' + L.ad + '</div>' +
+        '<div class="cl">' + L.kulup + ' · ' + tarihEtiket(L) + '</div>' +
+      '</div>' +
+      '<div class="tick"><span class="big"></span><span class="small"></span></div>';
+
+    listEl.innerHTML = "";
+    aktif.forEach(function (k, i) {
+      var li = document.createElement("li");
+      li.className = "person" + (i === 0 ? " top" : "");
+      li.innerHTML =
+        '<span class="rank">' + (i + 1) + '</span>' +
+        yuzSVG(k, 42) +
+        '<div class="who">' +
+          '<div class="nm">' + k.ad + (k.h === "gun" ? "" : ' <span class="chip soft">yaklaşık</span>') + '</div>' +
+          '<div class="cl">' + k.kulup + ' · ' + tarihEtiket(k) + '</div>' +
+          (k.not ? '<div class="sub">' + k.not + '</div>' : '') +
+        '</div>' +
+        '<div class="tick"><span class="big"></span><span class="small"></span></div>';
+      li.dataset.idx = i;
+      listEl.appendChild(li);
+    });
+
+    if (rol === "bk") {
+      tailEl.innerHTML =
+        '<div class="subhead">Başlangıcı doğrulanamayan 4 başkan</div>' +
+        '<ol class="board-list">' + BK_TARIHSIZ.map(function (b) {
+          return '<li class="person nodate">' +
+            '<span class="rank">—</span>' +
+            yuzSVG({ ad: b.ad, kulup: b.kulup, yuz: { stil: "kisa", sac: "#4A4238" } }, 42) +
+            '<div class="who"><div class="nm">' + b.ad + ' <span class="chip warn">tarih aranıyor</span></div>' +
+            '<div class="cl">' + b.kulup + '</div>' +
+            '<div class="sub">' + b.not + '</div></div>' +
+            '<div class="tick"><span class="big" style="color:var(--muted)">—</span></div>' +
+          '</li>';
+        }).join("") + '</ol>';
+    } else {
+      tailEl.innerHTML = "";
+    }
+
+    tikla();
+  }
+
+  function tikla() {
+    var now = new Date();
+    var L = aktif[0];
+    var lt = leaderEl.querySelector(".tick");
+    if (lt) {
+      lt.querySelector(".big").textContent = sureMetni(L, now);
+      lt.querySelector(".small").textContent = saatKismi(L.basDate, now);
+    }
+    listEl.querySelectorAll("li.person").forEach(function (li) {
+      var k = aktif[+li.dataset.idx];
+      li.querySelector(".tick .big").textContent = sureMetni(k, now);
+      li.querySelector(".tick .small").textContent = saatKismi(k.basDate, now);
+    });
+  }
+
+  document.querySelectorAll(".roles button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.querySelectorAll(".roles button").forEach(function (x) {
+        x.setAttribute("aria-pressed", x === b ? "true" : "false");
+      });
+      ciz(b.dataset.role);
+    });
+  });
+
+  ciz("td");
+  setInterval(tikla, 1000);
+
+  var tabs = document.querySelectorAll("nav button");
+  tabs.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      tabs.forEach(function (b) {
+        var sel = b === btn;
+        b.setAttribute("aria-selected", sel ? "true" : "false");
+        document.getElementById(b.getAttribute("aria-controls")).hidden = !sel;
+      });
+    });
+  });
+
+  /* ---------------- BİLMECE ---------------- */
+  var KITA = {
+    "Türkiye":"Avrupa","Brezilya":"Güney Amerika","Romanya":"Avrupa","İspanya":"Avrupa",
+    "Portekiz":"Avrupa","Hollanda":"Avrupa","Fildişi Sahili":"Afrika","Kamerun":"Afrika",
+    "Gürcistan":"Avrupa","Uruguay":"Güney Amerika","Çekya":"Avrupa","Fransa":"Avrupa"
+  };
+  var HAT = {
+    "Kaleci":"Kale","Stoper":"Defans","Sağ Bek":"Defans","Sol Bek":"Defans",
+    "Orta Saha":"Orta Saha","Ofansif Orta Saha":"Orta Saha","Kanat":"Hücum","Forvet":"Hücum"
+  };
+  var SEHIR = { "Galatasaray":"İstanbul","Fenerbahçe":"İstanbul","Beşiktaş":"İstanbul","Trabzonspor":"Anadolu" };
+
+  var P = [
+    ["Hakan Şükür","Türkiye","Forvet",1971,"Galatasaray"],
+    ["Alex de Souza","Brezilya","Ofansif Orta Saha",1977,"Fenerbahçe"],
+    ["Mario Jardel","Brezilya","Forvet",1973,"Galatasaray"],
+    ["Rüştü Reçber","Türkiye","Kaleci",1973,"Fenerbahçe"],
+    ["Tugay Kerimoğlu","Türkiye","Orta Saha",1970,"Galatasaray"],
+    ["Bülent Korkmaz","Türkiye","Stoper",1968,"Galatasaray"],
+    ["Gheorghe Popescu","Romanya","Stoper",1967,"Galatasaray"],
+    ["Roberto Carlos","Brezilya","Sol Bek",1973,"Fenerbahçe"],
+    ["Daniel Güiza","İspanya","Forvet",1980,"Fenerbahçe"],
+    ["Bobô","Brezilya","Forvet",1985,"Beşiktaş"],
+    ["Ricardo Quaresma","Portekiz","Kanat",1983,"Beşiktaş"],
+    ["Wesley Sneijder","Hollanda","Ofansif Orta Saha",1984,"Galatasaray"],
+    ["Didier Drogba","Fildişi Sahili","Forvet",1978,"Galatasaray"],
+    ["Robin van Persie","Hollanda","Forvet",1983,"Fenerbahçe"],
+    ["Vincent Aboubakar","Kamerun","Forvet",1992,"Beşiktaş"],
+    ["Emre Belözoğlu","Türkiye","Orta Saha",1980,"Fenerbahçe"],
+    ["Arda Turan","Türkiye","Kanat",1987,"Galatasaray"],
+    ["Semih Şentürk","Türkiye","Forvet",1983,"Fenerbahçe"],
+    ["Fatih Tekke","Türkiye","Forvet",1977,"Trabzonspor"],
+    ["Şota Arveladze","Gürcistan","Forvet",1973,"Trabzonspor"],
+    ["Burak Yılmaz","Türkiye","Forvet",1985,"Galatasaray"],
+    ["Selçuk İnan","Türkiye","Orta Saha",1985,"Galatasaray"],
+    ["Gökhan Gönül","Türkiye","Sağ Bek",1985,"Fenerbahçe"],
+    ["Volkan Demirel","Türkiye","Kaleci",1981,"Fenerbahçe"],
+    ["Mehmet Topal","Türkiye","Orta Saha",1986,"Fenerbahçe"],
+    ["Fernando Muslera","Uruguay","Kaleci",1986,"Galatasaray"],
+    ["Felipe Melo","Brezilya","Orta Saha",1983,"Galatasaray"],
+    ["Elano","Brezilya","Orta Saha",1981,"Galatasaray"],
+    ["Milan Baroš","Çekya","Forvet",1981,"Galatasaray"],
+    ["Nihat Kahveci","Türkiye","Forvet",1979,"Beşiktaş"],
+    ["Sergen Yalçın","Türkiye","Ofansif Orta Saha",1972,"Beşiktaş"],
+    ["Pascal Nouma","Fransa","Forvet",1972,"Beşiktaş"],
+    ["İlhan Mansız","Türkiye","Forvet",1975,"Beşiktaş"],
+    ["Hasan Şaş","Türkiye","Kanat",1976,"Galatasaray"],
+    ["Umut Bulut","Türkiye","Forvet",1983,"Galatasaray"]
+  ].map(function (r) { return { ad:r[0], ulke:r[1], mevki:r[2], dogum:r[3], takim:r[4] }; });
+
+  var YIL = new Date().getFullYear();
+  P.forEach(function (p) { p.yas = YIL - p.dogum; });
+
+  var EPOCH = Date.UTC(2026, 0, 1);
+  var gunNo = Math.floor((Date.now() - EPOCH) / 86400000);
+  var hedef = P[((gunNo % P.length) + P.length) % P.length];
+  document.getElementById("puzNo").textContent = "BİLMECE #" + (gunNo + 1);
+
+  var tahminler = [], bitti = false, MAX = 6;
+  var boardEl = document.getElementById("board");
+  var inputEl = document.getElementById("guess");
+  var suggEl  = document.getElementById("sugg");
+
+  function durum(p) {
+    var fark = Math.abs(p.yas - hedef.yas);
+    return {
+      takim: p.takim === hedef.takim ? "hit" : (SEHIR[p.takim] && SEHIR[p.takim] === SEHIR[hedef.takim] ? "near" : "miss"),
+      ulke:  p.ulke  === hedef.ulke  ? "hit" : (KITA[p.ulke] === KITA[hedef.ulke] ? "near" : "miss"),
+      mevki: p.mevki === hedef.mevki ? "hit" : (HAT[p.mevki] === HAT[hedef.mevki] ? "near" : "miss"),
+      yas:   fark === 0 ? "hit" : (fark <= 3 ? "near" : "miss")
+    };
+  }
+
+  function satirCiz(p) {
+    var d = durum(p);
+    var ok = p.yas === hedef.yas ? "" : (p.yas > hedef.yas ? " ↓" : " ↑");
+    var row = document.createElement("div");
+    row.className = "row";
+    [["Takım",p.takim,d.takim],["Ülke",p.ulke,d.ulke],["Mevki",p.mevki,d.mevki],["Yaş",p.yas+ok,d.yas]]
+      .forEach(function (c, i) {
+        var cell = document.createElement("div");
+        cell.className = "cell " + c[2] + " flip";
+        cell.style.animationDelay = (i * 90) + "ms";
+        cell.innerHTML = '<span class="lbl">' + c[0] + '</span><span class="val">' + c[1] + '</span>';
+        row.appendChild(cell);
+      });
+    boardEl.appendChild(row);
+  }
+
+  var EMOJI = { hit:"🟩", near:"🟨", miss:"⬜" };
+
+  function paylasimMetni() {
+    var satirlar = tahminler.map(function (p) {
+      var d = durum(p);
+      return EMOJI[d.takim] + EMOJI[d.ulke] + EMOJI[d.mevki] + EMOJI[d.yas];
+    });
+    var skor = tahminler.length && tahminler[tahminler.length - 1].ad === hedef.ad
+      ? tahminler.length + "/" + MAX : "X/" + MAX;
+    return "DOKSAN · Bilmece #" + (gunNo + 1) + "  " + skor + "\n\n" + satirlar.join("\n");
+  }
+
+  function geriSayim() {
+    var el = document.getElementById("cd");
+    function tik() {
+      var now = new Date(), yarin = new Date(now);
+      yarin.setHours(24, 0, 0, 0);
+      var s = Math.floor((yarin - now) / 1000);
+      el.textContent = String(Math.floor(s / 3600)).padStart(2, "0") + ":" +
+                       String(Math.floor(s % 3600 / 60)).padStart(2, "0") + ":" +
+                       String(s % 60).padStart(2, "0");
+    }
+    tik(); setInterval(tik, 1000);
+  }
+
+  function bitir(kazandi) {
+    bitti = true;
+    document.getElementById("guessZone").hidden = true;
+    document.getElementById("resTitle").textContent = kazandi
+      ? (tahminler.length === 1 ? "İlk tahminde! İnanılmaz." : tahminler.length + " tahminde bildin.")
+      : "Bugünlük bu kadar.";
+    document.getElementById("resAnswer").textContent =
+      "Cevap: " + hedef.ad + " — " + hedef.takim + ", " + hedef.ulke + ", " + hedef.mevki + ", " + hedef.yas;
+    document.getElementById("shareText").textContent = paylasimMetni();
+    document.getElementById("result").hidden = false;
+    geriSayim();
+  }
+
+  function tahminEt(p) {
+    if (bitti) return;
+    tahminler.push(p);
+    satirCiz(p);
+    inputEl.value = "";
+    suggEl.hidden = true;
+    if (p.ad === hedef.ad) bitir(true);
+    else if (tahminler.length >= MAX) bitir(false);
+  }
+
+  function normalize(s) {
+    return s.toLocaleLowerCase("tr").replace(/ı/g,"i").replace(/ğ/g,"g")
+            .replace(/ü/g,"u").replace(/ş/g,"s").replace(/ö/g,"o").replace(/ç/g,"c");
+  }
+
+  inputEl.addEventListener("input", function () {
+    var q = normalize(inputEl.value.trim());
+    if (!q) { suggEl.hidden = true; return; }
+    var kullanilan = tahminler.map(function (t) { return t.ad; });
+    var hits = P.filter(function (p) {
+      return normalize(p.ad).indexOf(q) !== -1 && kullanilan.indexOf(p.ad) === -1;
+    }).slice(0, 7);
+    if (!hits.length) { suggEl.hidden = true; return; }
+    suggEl.innerHTML = "";
+    hits.forEach(function (p) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.textContent = p.ad;
+      b.addEventListener("click", function () { tahminEt(p); });
+      suggEl.appendChild(b);
+    });
+    suggEl.hidden = false;
+  });
+
+  inputEl.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") {
+      var first = suggEl.querySelector("button");
+      if (first && !suggEl.hidden) first.click();
+    }
+    if (e.key === "Escape") suggEl.hidden = true;
+  });
+
+  document.getElementById("copyBtn").addEventListener("click", function () {
+    var btn = this;
+    var t = document.getElementById("shareText").textContent;
+    if (navigator.share) {
+      navigator.share({ text: t }).catch(function () {});
+      return;
+    }
+    navigator.clipboard.writeText(t).then(function () {
+      btn.textContent = "Kopyalandı";
+      setTimeout(function () { btn.textContent = "Sonucu kopyala"; }, 1800);
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
