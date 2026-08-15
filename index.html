@@ -4,253 +4,205 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0B1210">
-
-<!-- Güvenlik: sayfa hiçbir dış kaynağa bağlanamaz, hiçbir yere veri gönderemez.
-     Tüm stil/kod dosyanın içinde; dışarıdan script yüklenmesi tarayıcı seviyesinde engelli. -->
+<meta name="description" content="Süper Lig teknik direktör ve başkanlarının görev süresi canlı sayaç, günlük futbolcu bilmecesi.">
 <meta http-equiv="Content-Security-Policy"
       content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
-<meta name="description" content="Süper Lig teknik direktör ve başkanlarının görev süresi canlı sayaç. Bahissiz, reklamsız.">
-<title>DOKSAN — Koltuk Sayacı & Günlük Futbol Bilmecesi</title>
+<title>DALABALL — Koltuk Sayacı & Günün Futbolcusu</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%BD%3C/text%3E%3C/svg%3E">
 
 <style>
   :root {
-    --ground:     #0B1210;
-    --ground-2:   #101A17;
-    --surface:    #16211D;
-    --surface-2:  #1C2A25;
-    --line:       #263630;
-    --line-soft:  #1E2C27;
-    --ink:        #E9F0EB;
-    --ink-2:      #B4C4BB;
-    --muted:      #7C8F86;
-    --flood:      #F2A33C;
-    --hit:        #2E9E63;
-    --near:       #C9962B;
-    --miss:       #26332F;
+    --ground:#0B1210; --ground-2:#101A17; --surface:#16211D; --surface-2:#1C2A25;
+    --line:#263630; --line-soft:#1E2C27; --ink:#E9F0EB; --ink-2:#B4C4BB; --muted:#7C8F86;
+    --flood:#F2A33C; --hit:#2E9E63; --near:#C9962B; --miss:#26332F;
     --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
     --pad: clamp(14px, 4vw, 32px);
   }
-
   * { box-sizing: border-box; }
-
   html { -webkit-text-size-adjust: 100%; }
-
   body {
-    margin: 0; background: var(--ground); color: var(--ink);
-    font-family: var(--sans); font-size: 16px; line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--sans); font-size:16px; line-height:1.5;
+    -webkit-font-smoothing:antialiased; overflow-x:hidden;
   }
   body::before {
-    content: ""; position: fixed; inset: 0 0 auto 0; height: 380px;
-    background: radial-gradient(120% 100% at 50% 0%, rgba(242,163,60,.10), transparent 70%);
-    pointer-events: none; z-index: 0;
+    content:""; position:fixed; inset:0 0 auto 0; height:380px;
+    background:radial-gradient(120% 100% at 50% 0%, rgba(242,163,60,.10), transparent 70%);
+    pointer-events:none; z-index:0;
   }
   .wrap {
-    position: relative; z-index: 1; max-width: 960px; margin: 0 auto;
-    padding: 0 var(--pad) 64px;
-    padding-left: max(var(--pad), env(safe-area-inset-left));
-    padding-right: max(var(--pad), env(safe-area-inset-right));
+    position:relative; z-index:1; max-width:960px; margin:0 auto; padding:0 var(--pad) 60px;
+    padding-left:max(var(--pad), env(safe-area-inset-left));
+    padding-right:max(var(--pad), env(safe-area-inset-right));
   }
 
-  header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; padding: 24px 0 16px; border-bottom: 1px solid var(--line); }
-  .brand { font-size: clamp(28px, 9vw, 44px); font-weight: 800; letter-spacing: -.03em; line-height: 1; margin: 0; text-transform: uppercase; }
-  .brand span { color: var(--flood); }
-  .tagline { font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  header { display:flex; flex-wrap:wrap; align-items:baseline; gap:6px 16px; padding:24px 0 16px; border-bottom:1px solid var(--line); }
+  .brand { font-size:clamp(28px,9vw,44px); font-weight:800; letter-spacing:-.03em; line-height:1; margin:0; text-transform:uppercase; }
+  .brand span { color:var(--flood); }
+  .tagline { font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
 
-  nav { display: flex; gap: 4px; margin: 16px 0 22px; padding: 4px; background: var(--ground-2); border: 1px solid var(--line-soft); border-radius: 3px; }
+  nav { display:flex; gap:4px; margin:16px 0 22px; padding:4px; background:var(--ground-2); border:1px solid var(--line-soft); border-radius:3px; }
   nav button {
-    flex: 1; appearance: none; background: transparent; border: 0; color: var(--muted);
-    font-family: var(--mono); font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase;
-    padding: 13px 6px; border-radius: 2px; cursor: pointer; transition: color .15s, background .15s;
-    min-height: 44px;
+    flex:1; appearance:none; background:transparent; border:0; color:var(--muted);
+    font-family:var(--mono); font-size:11.5px; letter-spacing:.1em; text-transform:uppercase;
+    padding:13px 6px; border-radius:2px; cursor:pointer; min-height:44px; transition:color .15s, background .15s;
   }
-  nav button:hover { color: var(--ink-2); }
-  nav button[aria-selected="true"] { background: var(--flood); color: #171104; font-weight: 700; }
-  nav button:focus-visible { outline: 2px solid var(--flood); outline-offset: 2px; }
-  .panel[hidden] { display: none; }
+  nav button:hover { color:var(--ink-2); }
+  nav button[aria-selected="true"] { background:var(--flood); color:#171104; font-weight:700; }
+  nav button:focus-visible { outline:2px solid var(--flood); outline-offset:2px; }
+  .panel[hidden] { display:none; }
 
-  .eyebrow { font-family: var(--mono); font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
-  h2 { font-size: clamp(19px, 5vw, 22px); font-weight: 700; letter-spacing: -.01em; margin: 0 0 6px; text-wrap: balance; }
-  .note { color: var(--ink-2); font-size: 14px; margin: 0; max-width: 66ch; }
+  .eyebrow { font-family:var(--mono); font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin:0 0 6px; }
+  h2 { font-size:clamp(19px,5vw,22px); font-weight:700; letter-spacing:-.01em; margin:0 0 6px; text-wrap:balance; }
+  .note { color:var(--ink-2); font-size:14px; margin:0; max-width:66ch; }
 
   .chip {
-    display: inline-block; font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em;
-    text-transform: uppercase; padding: 3px 7px; border-radius: 2px; white-space: nowrap;
-    background: rgba(242,163,60,.13); color: var(--flood); border: 1px solid rgba(242,163,60,.3);
-    vertical-align: 2px;
+    display:inline-block; font-family:var(--mono); font-size:9.5px; letter-spacing:.1em;
+    text-transform:uppercase; padding:3px 7px; border-radius:2px; white-space:nowrap;
+    background:rgba(242,163,60,.13); color:var(--flood); border:1px solid rgba(242,163,60,.3); vertical-align:2px;
   }
-  .chip.soft { background: rgba(124,143,134,.12); color: var(--muted); border-color: rgba(124,143,134,.28); }
-  .chip.warn { background: rgba(201,150,43,.14); color: var(--near); border-color: rgba(201,150,43,.35); }
 
   .versus {
-    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px;
-    margin: 20px 0 4px; padding: 15px 16px;
-    background: var(--ground-2); border: 1px solid var(--line); border-radius: 3px;
+    display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:12px;
+    margin:20px 0 4px; padding:15px 16px; background:var(--ground-2); border:1px solid var(--line); border-radius:3px;
   }
-  .versus .side { text-align: center; min-width: 0; }
-  .versus .side .k { font-family: var(--mono); font-size: 9.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); display: block; }
-  .versus .side .v { font-family: var(--mono); font-size: clamp(19px, 6vw, 28px); font-weight: 700; font-variant-numeric: tabular-nums; color: var(--flood); line-height: 1.25; }
-  .versus .side .v small { font-size: 11.5px; color: var(--ink-2); font-weight: 400; }
-  .versus .mid { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; color: var(--muted); text-transform: uppercase; }
+  .versus .side { text-align:center; min-width:0; }
+  .versus .side .k { font-family:var(--mono); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); display:block; }
+  .versus .side .v { font-family:var(--mono); font-size:clamp(19px,6vw,28px); font-weight:700; font-variant-numeric:tabular-nums; color:var(--flood); line-height:1.25; }
+  .versus .side .v small { font-size:11.5px; color:var(--ink-2); font-weight:400; }
+  .versus .mid { font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; color:var(--muted); text-transform:uppercase; }
 
-  .roles { display: flex; gap: 6px; margin: 18px 0 4px; }
+  .roles { display:flex; gap:6px; margin:18px 0 4px; }
   .roles button {
-    flex: 1; appearance: none; background: var(--surface); border: 1px solid var(--line);
-    color: var(--ink-2); font-family: var(--sans); font-size: 14px; font-weight: 600;
-    padding: 11px 12px; border-radius: 999px; cursor: pointer; min-height: 44px;
+    flex:1; appearance:none; background:var(--surface); border:1px solid var(--line); color:var(--ink-2);
+    font-family:var(--sans); font-size:14px; font-weight:600; padding:11px 12px; border-radius:999px; cursor:pointer; min-height:44px;
   }
-  .roles button[aria-pressed="true"] { background: var(--flood); border-color: var(--flood); color: #171104; }
-  .roles button:focus-visible { outline: 2px solid var(--flood); outline-offset: 2px; }
-
-  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 7px; margin: 16px 0 6px; }
-  .stat { background: var(--surface); border: 1px solid var(--line-soft); border-radius: 3px; padding: 12px 14px; }
-  .stat .k { font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 5px; }
-  .stat .v { font-family: var(--mono); font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--flood); }
-  .stat .v small { font-size: 10.5px; color: var(--ink-2); font-weight: 400; }
+  .roles button[aria-pressed="true"] { background:var(--flood); border-color:var(--flood); color:#171104; }
+  .roles button:focus-visible { outline:2px solid var(--flood); outline-offset:2px; }
 
   .record {
-    margin: 16px 0 12px; padding: 15px 16px;
-    background: linear-gradient(180deg, rgba(242,163,60,.10), transparent);
-    border: 1px solid rgba(242,163,60,.28); border-radius: 3px;
+    margin:16px 0 12px; padding:15px 16px;
+    background:linear-gradient(180deg, rgba(242,163,60,.10), transparent);
+    border:1px solid rgba(242,163,60,.28); border-radius:3px;
   }
-  .record .hd { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
-  .record .crown { font-size: 15px; line-height: 1; }
-  .record .txt { font-size: 14px; color: var(--ink-2); line-height: 1.45; }
-  .record .txt b { color: var(--ink); font-weight: 700; }
-  .record .txt .sure { color: var(--flood); font-family: var(--mono); font-weight: 600; white-space: nowrap; }
-  .bar { margin-top: 11px; height: 6px; background: var(--ground-2); border: 1px solid var(--line-soft); border-radius: 999px; overflow: hidden; }
-  .bar > i { display: block; height: 100%; background: var(--flood); border-radius: 999px; transition: width .6s ease; }
-  .record .gap {
-    margin-top: 8px; font-family: var(--mono); font-size: 11px; letter-spacing: .03em;
-    color: var(--muted); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap;
-  }
-  .record .gap b { color: var(--flood); font-weight: 600; }
+  .record .hd { display:flex; align-items:center; gap:9px; margin-bottom:8px; }
+  .record .crown { font-size:15px; line-height:1; }
+  .record .txt { font-size:14px; color:var(--ink-2); line-height:1.45; }
+  .record .txt b { color:var(--ink); font-weight:700; }
+  .record .txt .sure { color:var(--flood); font-family:var(--mono); font-weight:600; white-space:nowrap; }
+  .bar { margin-top:11px; height:6px; background:var(--ground-2); border:1px solid var(--line-soft); border-radius:999px; overflow:hidden; }
+  .bar > i { display:block; height:100%; background:var(--flood); border-radius:999px; transition:width .6s ease; }
+  .record .gap { margin-top:8px; font-family:var(--mono); font-size:11px; letter-spacing:.03em; color:var(--muted); display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+  .record .gap b { color:var(--flood); font-weight:600; }
 
-  ol.board-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+  .stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:7px; margin:16px 0 6px; }
+  .stat { background:var(--surface); border:1px solid var(--line-soft); border-radius:3px; padding:12px 14px; }
+  .stat .k { font-family:var(--mono); font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); display:block; margin-bottom:5px; }
+  .stat .v { font-family:var(--mono); font-size:20px; font-weight:600; font-variant-numeric:tabular-nums; color:var(--flood); }
+  .stat .v small { font-size:10.5px; color:var(--ink-2); font-weight:400; }
 
+  ol.board-list { list-style:none; margin:0; padding:0; display:grid; gap:4px; }
   li.person {
-    display: grid;
-    grid-template-columns: 26px 44px 1fr auto;
-    grid-template-areas: "rank ava who tick";
-    align-items: center; gap: 10px;
-    background: var(--surface); border: 1px solid var(--line-soft); border-radius: 3px;
-    padding: 10px 13px;
+    display:grid; grid-template-columns:26px 44px 1fr auto;
+    grid-template-areas:"rank ava who tick"; align-items:center; gap:10px;
+    background:var(--surface); border:1px solid var(--line-soft); border-radius:3px; padding:10px 13px;
   }
-  li.person.top { border-color: rgba(242,163,60,.35); }
-  li.person.nodate { opacity: .82; }
-  li.person > .rank { grid-area: rank; }
-  li.person > svg    { grid-area: ava; }
-  li.person > .who   { grid-area: who; }
-  li.person > .tick  { grid-area: tick; }
+  li.person.top { border-color:rgba(242,163,60,.35); }
+  li.person.nodate { opacity:.8; }
+  li.person > .rank { grid-area:rank; }
+  li.person > svg   { grid-area:ava; }
+  li.person > .who  { grid-area:who; }
+  li.person > .tick { grid-area:tick; }
 
-  .rank { font-family: var(--mono); font-size: 13.5px; font-variant-numeric: tabular-nums; color: var(--muted); text-align: right; }
-  li.person.top .rank { color: var(--flood); font-weight: 700; }
+  .rank { font-family:var(--mono); font-size:13.5px; font-variant-numeric:tabular-nums; color:var(--muted); text-align:right; }
+  li.person.top .rank { color:var(--flood); font-weight:700; }
 
-  .who { min-width: 0; }
-  .who .nm { font-size: 15px; font-weight: 600; line-height: 1.3; }
-  .who .cl { font-family: var(--mono); font-size: 10.5px; letter-spacing: .04em; color: var(--muted); text-transform: uppercase; line-height: 1.45; }
-  .who .sub { font-size: 11.5px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
-  .who .sub em { color: var(--ink-2); font-style: normal; font-weight: 600; }
+  .who { min-width:0; }
+  .who .nm { font-size:15px; font-weight:600; line-height:1.3; }
+  .who .cl { font-family:var(--mono); font-size:10.5px; letter-spacing:.04em; color:var(--muted); text-transform:uppercase; line-height:1.45; }
+  .who .sub { font-size:11.5px; color:var(--muted); margin-top:3px; line-height:1.4; }
+  .who .sub em { color:var(--ink-2); font-style:normal; font-weight:600; }
 
-  .tick { font-family: var(--mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
-  .tick .big { font-size: 13.5px; font-weight: 600; color: var(--ink); display: block; }
-  .tick .small { font-size: 12px; color: var(--flood); letter-spacing: .04em; }
+  .tick { font-family:var(--mono); font-variant-numeric:tabular-nums; text-align:right; white-space:nowrap; }
+  .tick .big { font-size:13.5px; font-weight:600; color:var(--ink); display:block; }
+  .tick .small { font-size:12px; color:var(--flood); letter-spacing:.04em; }
 
-  .subhead {
-    margin: 22px 0 8px; font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em;
-    text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 10px;
-  }
-  .subhead::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+  .subhead { margin:22px 0 8px; font-family:var(--mono); font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); display:flex; align-items:center; gap:10px; }
+  .subhead::after { content:""; flex:1; height:1px; background:var(--line); }
 
-  .method { margin-top: 20px; background: rgba(242,163,60,.06); border: 1px solid rgba(242,163,60,.22); border-radius: 3px; padding: 15px 16px; font-size: 13px; color: var(--ink-2); }
-  .method b { color: var(--ink); }
-  .method p { margin: 0 0 9px; }
-  .method p:last-child { margin: 0; }
-
-  /* --- bilmece --- */
-  .puz-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
-  .puz-no { font-family: var(--mono); font-size: 11.5px; color: var(--muted); letter-spacing: .08em; }
-  .board { display: grid; gap: 5px; margin: 16px 0; }
-  .row { display: grid; grid-template-columns: 1.45fr 1fr 1.15fr .62fr; gap: 5px; }
+  /* ---- bilmece ---- */
+  .puz-head { display:flex; justify-content:space-between; align-items:flex-end; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+  .puz-no { font-family:var(--mono); font-size:11.5px; color:var(--muted); letter-spacing:.08em; }
+  .board { display:grid; gap:4px; margin:16px 0; }
+  .row { display:grid; grid-template-columns:repeat(6,1fr); gap:4px; }
   .cell {
-    background: var(--surface); border: 1px solid var(--line-soft); border-radius: 2px;
-    min-height: 56px; padding: 7px 4px; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; text-align: center; gap: 2px;
-    overflow: hidden;
+    background:var(--surface); border:1px solid var(--line-soft); border-radius:2px;
+    min-height:60px; padding:6px 3px; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center; gap:2px; overflow:hidden;
   }
-  .cell .lbl { font-family: var(--mono); font-size: 8.5px; letter-spacing: .08em; text-transform: uppercase; opacity: .55; }
-  .cell .val { font-size: clamp(10.5px, 2.9vw, 13px); font-weight: 600; line-height: 1.15; overflow-wrap: anywhere; }
-  .cell.hit  { background: var(--hit);  border-color: var(--hit);  color: #04150B; }
-  .cell.near { background: var(--near); border-color: var(--near); color: #1A1203; }
-  .cell.miss { background: var(--miss); border-color: var(--miss); color: var(--ink-2); }
-  .cell.flip { animation: flip .45s ease both; }
-  @keyframes flip { 0% { transform: rotateX(-90deg); opacity: 0; } 100% { transform: rotateX(0); opacity: 1; } }
-  @media (prefers-reduced-motion: reduce) { .cell.flip { animation: none; } }
-  .hdr-row .cell { min-height: 0; background: transparent; border: 0; padding: 0 0 4px; }
-  .hdr-row .cell .lbl { opacity: 1; color: var(--muted); }
+  .cell .lbl { font-family:var(--mono); font-size:8px; letter-spacing:.06em; text-transform:uppercase; opacity:.55; }
+  .cell .val { font-size:clamp(9.5px,2.5vw,12px); font-weight:600; line-height:1.15; overflow-wrap:anywhere; hyphens:auto; }
+  .cell.hit  { background:var(--hit);  border-color:var(--hit);  color:#04150B; }
+  .cell.near { background:var(--near); border-color:var(--near); color:#1A1203; }
+  .cell.miss { background:var(--miss); border-color:var(--miss); color:var(--ink-2); }
+  .cell.flip { animation:flip .45s ease both; }
+  @keyframes flip { 0%{transform:rotateX(-90deg);opacity:0;} 100%{transform:rotateX(0);opacity:1;} }
+  @media (prefers-reduced-motion: reduce) { .cell.flip { animation:none; } }
+  .hdr-row .cell { min-height:0; background:transparent; border:0; padding:0 0 4px; }
+  .hdr-row .cell .lbl { opacity:1; color:var(--muted); }
 
-  .guess-zone { position: relative; margin-top: 14px; }
+  .guess-zone { position:relative; margin-top:14px; }
   input[type="text"] {
-    width: 100%; background: var(--ground-2); border: 1px solid var(--line); border-radius: 3px;
-    color: var(--ink); font-family: var(--sans); font-size: 16px; padding: 14px;
+    width:100%; background:var(--ground-2); border:1px solid var(--line); border-radius:3px;
+    color:var(--ink); font-family:var(--sans); font-size:16px; padding:14px;
   }
-  input[type="text"]::placeholder { color: var(--muted); }
-  input[type="text"]:focus { outline: 2px solid var(--flood); outline-offset: -1px; border-color: transparent; }
-  .sugg { position: absolute; left: 0; right: 0; top: calc(100% + 4px); background: var(--surface-2); border: 1px solid var(--line); border-radius: 3px; max-height: 46vh; overflow-y: auto; z-index: 5; -webkit-overflow-scrolling: touch; }
-  .sugg[hidden] { display: none; }
-  .sugg button { display: block; width: 100%; text-align: left; background: transparent; border: 0; border-bottom: 1px solid var(--line-soft); color: var(--ink); font-family: var(--sans); font-size: 15px; padding: 13px 14px; cursor: pointer; min-height: 46px; }
-  .sugg button:last-child { border-bottom: 0; }
-  .sugg button:hover, .sugg button:focus-visible { background: var(--flood); color: #171104; outline: none; }
+  input[type="text"]::placeholder { color:var(--muted); }
+  input[type="text"]:focus { outline:2px solid var(--flood); outline-offset:-1px; border-color:transparent; }
+  .hint { font-family:var(--mono); font-size:11px; color:var(--muted); margin-top:8px; letter-spacing:.03em; }
+  .sugg { position:absolute; left:0; right:0; top:calc(100% + 4px); background:var(--surface-2); border:1px solid var(--line); border-radius:3px; max-height:46vh; overflow-y:auto; z-index:5; -webkit-overflow-scrolling:touch; }
+  .sugg[hidden] { display:none; }
+  .sugg button { display:block; width:100%; text-align:left; background:transparent; border:0; border-bottom:1px solid var(--line-soft); color:var(--ink); font-family:var(--sans); font-size:15px; padding:13px 14px; cursor:pointer; min-height:46px; }
+  .sugg button:last-child { border-bottom:0; }
+  .sugg button .meta { display:block; font-family:var(--mono); font-size:10.5px; color:var(--muted); margin-top:2px; }
+  .sugg button:hover, .sugg button:focus-visible { background:var(--flood); color:#171104; outline:none; }
+  .sugg button:hover .meta, .sugg button:focus-visible .meta { color:rgba(23,17,4,.7); }
 
-  .result { margin-top: 18px; padding: 18px; background: var(--surface); border: 1px solid var(--line); border-left: 3px solid var(--flood); border-radius: 3px; }
-  .result[hidden] { display: none; }
-  .result h3 { margin: 0 0 4px; font-size: 17px; }
-  .result .answer { font-size: 14px; color: var(--ink-2); margin: 0 0 14px; }
-  pre.share { font-family: var(--mono); font-size: 14px; line-height: 1.45; background: var(--ground); border: 1px solid var(--line-soft); border-radius: 3px; padding: 14px; margin: 0 0 12px; overflow-x: auto; }
-  .btn { appearance: none; background: var(--flood); color: #171104; border: 0; border-radius: 3px; font-family: var(--mono); font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 14px 18px; cursor: pointer; min-height: 46px; }
-  .btn:hover { background: #FFBA5C; }
-  .btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-  .countdown { font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: .06em; margin-top: 14px; }
-  .countdown b { color: var(--flood); font-weight: 600; }
+  .result { margin-top:18px; padding:18px; background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--flood); border-radius:3px; }
+  .result[hidden] { display:none; }
+  .result h3 { margin:0 0 4px; font-size:17px; }
+  .result .answer { font-size:14px; color:var(--ink-2); margin:0 0 14px; }
+  pre.share { font-family:var(--mono); font-size:13px; line-height:1.4; background:var(--ground); border:1px solid var(--line-soft); border-radius:3px; padding:14px; margin:0 0 12px; overflow-x:auto; }
+  .btn { appearance:none; background:var(--flood); color:#171104; border:0; border-radius:3px; font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; padding:14px 18px; cursor:pointer; min-height:46px; }
+  .btn:hover { background:#FFBA5C; }
+  .btn:focus-visible { outline:2px solid var(--ink); outline-offset:2px; }
+  .countdown { font-family:var(--mono); font-size:12px; color:var(--muted); letter-spacing:.06em; margin-top:14px; }
+  .countdown b { color:var(--flood); font-weight:600; }
 
-  footer { margin-top: 44px; padding-top: 20px; border-top: 1px solid var(--line); font-size: 12.5px; color: var(--muted); }
-  footer p { margin: 0 0 8px; max-width: 72ch; }
-  footer strong { color: var(--ink-2); font-weight: 600; }
+  footer { margin-top:40px; padding-top:18px; border-top:1px solid var(--line); font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
 
-  /* ================= TELEFON ================= */
-  @media (max-width: 620px) {
+  @media (max-width:620px) {
     li.person {
-      grid-template-columns: 24px 42px 1fr;
-      grid-template-areas:
-        "rank ava who"
-        "tick tick tick";
-      gap: 4px 10px;
-      padding: 11px 12px;
+      grid-template-columns:24px 42px 1fr;
+      grid-template-areas:"rank ava who" "tick tick tick";
+      gap:4px 10px; padding:11px 12px;
     }
     li.person > .tick {
-      text-align: left;
-      padding-top: 8px;
-      margin-top: 4px;
-      border-top: 1px solid var(--line-soft);
-      display: flex; align-items: baseline; gap: 9px;
+      text-align:left; padding-top:8px; margin-top:4px; border-top:1px solid var(--line-soft);
+      display:flex; align-items:baseline; gap:9px;
     }
-    .tick .big { font-size: 14px; }
-    .tick .small { font-size: 13px; }
-
-    .versus { grid-template-columns: 1fr 1fr; gap: 10px; padding: 14px; }
-    .versus .mid { grid-column: 1 / -1; order: -1; text-align: center; font-size: 9.5px; }
-
-    .stats { grid-template-columns: 1fr 1fr; }
+    .tick .big { font-size:14px; }
+    .tick .small { font-size:13px; }
+    .versus { grid-template-columns:1fr 1fr; gap:10px; padding:14px; }
+    .versus .mid { grid-column:1 / -1; order:-1; text-align:center; font-size:9.5px; }
+    .stats { grid-template-columns:1fr 1fr; }
+    .cell { min-height:56px; }
   }
-
-  @media (max-width: 390px) {
-    .row { grid-template-columns: 1.35fr 1fr 1.1fr .6fr; gap: 4px; }
-    .cell { min-height: 52px; padding: 6px 2px; }
-    .who .nm { font-size: 14.5px; }
+  @media (max-width:400px) {
+    .row { gap:3px; }
+    .cell { min-height:52px; padding:5px 2px; }
+    .cell .lbl { font-size:7.5px; }
   }
 </style>
 </head>
@@ -259,17 +211,16 @@
 <div class="wrap">
 
   <header>
-    <h1 class="brand">DOK<span>SAN</span></h1>
+    <h1 class="brand">DALA<span>BALL</span></h1>
     <p class="tagline">bahissiz · reklamsız · her gün yeni</p>
   </header>
 
   <nav role="tablist">
     <button role="tab" aria-selected="true"  aria-controls="p-board"  id="t-board">Koltuk Sayacı</button>
-    <button role="tab" aria-selected="false" aria-controls="p-puzzle" id="t-puzzle">Günün Bilmecesi</button>
+    <button role="tab" aria-selected="false" aria-controls="p-puzzle" id="t-puzzle">Günün Futbolcusu</button>
   </nav>
 
   <section class="panel" id="p-board" role="tabpanel" aria-labelledby="t-board">
-
     <p class="eyebrow">Canlı sayaç · Trendyol Süper Lig 2026-27</p>
     <h2 id="boardTitle">Koltukta kim ne kadar dayandı?</h2>
     <p class="note" id="boardNote"></p>
@@ -285,30 +236,30 @@
     <div class="stats" id="stats"></div>
     <ol class="board-list" id="list"></ol>
     <div id="tailBox"></div>
-
-    <div class="method">
-      <p><b>Sayaç kesintisiz görevi ölçer.</b> Yeniden seçilmek süreyi sıfırlamaz. Serdal Adalı 29.12.2024'te olağanüstü seçimle geldi, Mayıs 2025'te güven tazeledi — sayaç 2024'ten işliyor. Memik Yılmaz 04.02.2023'ten beri görevde; 26.06.2026'da üçüncü kez seçilmesi süreyi bölmez.</p>
-      <p><b>Önceki dönemler ayrı sayılır.</b> Arada başkası oturduysa süre kesilmiştir: Aziz Yıldırım'ın 1998-2018 başkanlığı, 2026'da başlayan dönemiyle aynı sayaca girmez. Bu kişilerin altında önceki dönem ayrıca yazılıdır.</p>
-      <p><b>Tüm sayaçlar saniyesine kadar işler.</b> Göreve başlama günü kesin bilinenler doğrudan o tarihten sayar. Kaynaklarda yalnızca yılı ya da ayı doğrulanabilenler <span class="chip soft">yaklaşık</span> etiketi ve <b>≈</b> işaretiyle gösterilir — sayaç yine çalışır, başlangıç günü tahminîdir, gün netleştikçe güncellenir.</p>
-    </div>
-
   </section>
 
   <section class="panel" id="p-puzzle" role="tabpanel" aria-labelledby="t-puzzle" hidden>
     <div class="puz-head">
       <div>
-        <p class="eyebrow">Efsaneler modu</p>
+        <p class="eyebrow" id="poolInfo">Süper Lig arşivi</p>
         <h2>Bugünün futbolcusunu bul</h2>
-        <p class="note">6 hakkın var. Her tahminden sonra kutular renk verir: <b style="color:var(--hit)">yeşil</b> tam isabet, <b style="color:var(--near)">sarı</b> yakın, gri uzak. Yaş için ok yönüne bak.</p>
+        <p class="note">6 hakkın var. <b style="color:var(--hit)">Yeşil</b> tam isabet, <b style="color:var(--near)">sarı</b> yakın, gri uzak. Yaşta ve dönemde okun gösterdiği yöne bak.</p>
       </div>
-      <div class="puz-no" id="puzNo">BİLMECE #—</div>
+      <div class="puz-no" id="puzNo">#—</div>
+    </div>
+
+    <div class="roles" id="modes">
+      <button type="button" aria-pressed="true"  data-mode="sl">Süper Lig</button>
+      <button type="button" aria-pressed="false" data-mode="dunya">Dünya</button>
     </div>
 
     <div class="board" id="board">
       <div class="row hdr-row">
         <div class="cell"><span class="lbl">Takım</span></div>
         <div class="cell"><span class="lbl">Ülke</span></div>
+        <div class="cell"><span class="lbl">Kıta</span></div>
         <div class="cell"><span class="lbl">Mevki</span></div>
+        <div class="cell"><span class="lbl">Dönem</span></div>
         <div class="cell"><span class="lbl">Yaş</span></div>
       </div>
     </div>
@@ -317,22 +268,18 @@
       <input type="text" id="guess" placeholder="Futbolcu adı yaz…" autocomplete="off" autocapitalize="words" aria-label="Futbolcu adı" />
       <div class="sugg" id="sugg" hidden></div>
     </div>
+    <p class="hint" id="hint"></p>
 
     <div class="result" id="result" hidden>
       <h3 id="resTitle"></h3>
       <p class="answer" id="resAnswer"></p>
       <pre class="share" id="shareText"></pre>
-      <button class="btn" id="copyBtn">Sonucu kopyala</button>
+      <button class="btn" id="copyBtn">Sonucu paylaş</button>
       <div class="countdown">Yeni bilmeceye kalan süre: <b id="cd">--:--:--</b></div>
     </div>
   </section>
 
-  <footer>
-    <p><strong>Görseller temsilîdir.</strong> Kişilerin fotoğrafı kullanılmıyor; ajans telifli oldukları için. Her kart, gerçek portre olmayan <em>genel bir çizim</em> ve kişinin kulübünün <em>renklerinden</em> oluşan zemin taşır. Kulüp renkleri korunmuyor, armaları korunuyor — o yüzden arma yok.</p>
-    <p>Bu site hiçbir kulüp, TFF veya lig organizasyonu ile bağlantılı değildir. Bahis içeriği, oran ve yönlendirme <strong>hiçbir koşulda</strong> yer almaz.</p>
-    <p><strong>Veri toplamıyoruz.</strong> Çerez yok, takip yok, analiz yok, üyelik yok. Sayfa hiçbir dış sunucuya bağlanmaz — açtığın anda her şey cihazında çalışır ve hiçbir yere bilgi gitmez.</p>
-  </footer>
-
+  <footer>Bahis yok · Reklam yok · Veri toplanmıyor</footer>
 </div>
 
 <script>
@@ -340,508 +287,738 @@
   "use strict";
 
   var RENK = {
-    "Galatasaray":     ["#A90432", "#FBB800"],
-    "Fenerbahçe":      ["#1B458F", "#FFED00"],
-    "Beşiktaş":        ["#111111", "#F5F5F5"],
-    "Trabzonspor":     ["#86123A", "#1D4E9C"],
-    "Başakşehir":      ["#14315C", "#E86A17"],
-    "Samsunspor":      ["#C8102E", "#F5F5F5"],
-    "Konyaspor":       ["#00693E", "#F5F5F5"],
-    "Alanyaspor":      ["#F47B20", "#00693E"],
-    "Çaykur Rizespor": ["#00693E", "#1B458F"],
-    "Gaziantep FK":    ["#C8102E", "#111111"],
-    "Göztepe":         ["#C8102E", "#FBB800"],
-    "Kasımpaşa":       ["#1B458F", "#F5F5F5"],
-    "Kocaelispor":     ["#00693E", "#111111"],
-    "Eyüpspor":        ["#5B2A86", "#FBB800"],
-    "Gençlerbirliği":  ["#C8102E", "#111111"],
-    "Çorum FK":        ["#C8102E", "#F5F5F5"],
-    "Erzurumspor FK":  ["#1B458F", "#F5F5F5"],
-    "Amedspor":        ["#C8102E", "#00693E"]
+    "Galatasaray":["#A90432","#FBB800"], "Fenerbahçe":["#1B458F","#FFED00"],
+    "Beşiktaş":["#111111","#F5F5F5"], "Trabzonspor":["#86123A","#1D4E9C"],
+    "Başakşehir":["#14315C","#E86A17"], "Samsunspor":["#C8102E","#F5F5F5"],
+    "Konyaspor":["#00693E","#F5F5F5"], "Alanyaspor":["#F47B20","#00693E"],
+    "Çaykur Rizespor":["#00693E","#1B458F"], "Gaziantep FK":["#C8102E","#111111"],
+    "Göztepe":["#C8102E","#FBB800"], "Kasımpaşa":["#1B458F","#F5F5F5"],
+    "Kocaelispor":["#00693E","#111111"], "Eyüpspor":["#5B2A86","#FBB800"],
+    "Gençlerbirliği":["#C8102E","#111111"], "Çorum FK":["#C8102E","#F5F5F5"],
+    "Erzurumspor FK":["#1B458F","#F5F5F5"], "Amedspor":["#C8102E","#00693E"]
   };
 
   var TD = [
-    { ad:"Okan Buruk",        kulup:"Galatasaray",     bas:"2022-06-23", h:"gun", yuz:{sac:"#1E1712",stil:"kisa"},
+    { ad:"Okan Buruk", kulup:"Galatasaray", bas:"2022-06-23", h:"gun", yuz:{sac:"#1E1712",stil:"kisa"},
       not:"Galatasaray'da <em>tek dönem rekoru</em> — Fatih Terim'in 1.480 gününü geçti" },
-    { ad:"Stanimir Stoilov",  kulup:"Göztepe",         bas:"2023-11-21", h:"gun", yuz:{sac:"#8C8C8C",stil:"seyrek",ten:"#EFC49F"} },
-    { ad:"Fatih Tekke",       kulup:"Trabzonspor",     bas:"2025-03-11", h:"gun", yuz:{sac:"#241C15",stil:"kisa",sakal:1} },
-    { ad:"João Pereira",      kulup:"Alanyaspor",      bas:"2025-03-22", h:"gun", yuz:{sac:"#231A12",stil:"kisa",sakal:1} },
-    { ad:"Selçuk İnan",       kulup:"Kocaelispor",     bas:"2025-06-03", h:"gun", yuz:{sac:"#1E1712",stil:"kisa",sakal:1} },
-    { ad:"Serkan Özbalta",    kulup:"Erzurumspor FK",  bas:"2025-07-01", h:"gun", yuz:{sac:"#2A211A",stil:"kisa"} },
-    { ad:"Nuri Şahin",        kulup:"Başakşehir",      bas:"2025-09-15", h:"gun", yuz:{sac:"#1E1712",stil:"kisa",sakal:1} },
-    { ad:"Recep Uçar",        kulup:"Çaykur Rizespor", bas:"2025-12-03", h:"gun", yuz:{sac:"#2A211A",stil:"kisa"} },
-    { ad:"Emre Belözoğlu",    kulup:"Kasımpaşa",       bas:"2025-12-05", h:"gun", yuz:{sac:"#1E1712",stil:"kisa"} },
-    { ad:"İlhan Palut",       kulup:"Konyaspor",       bas:"2026-02-06", h:"gun", yuz:{sac:"#2A211A",stil:"kisa",sakal:1},
-      not:"Konyaspor'daki <em>2. dönemi</em> — ilk dönem 2021-2023" },
-    { ad:"Thorsten Fink",     kulup:"Samsunspor",      bas:"2026-02-16", h:"gun", yuz:{sac:"#9A9A96",stil:"kisa",ten:"#F0CDAE"} },
-    { ad:"Uğur Uçar",         kulup:"Çorum FK",        bas:"2026-02-17", h:"gun", yuz:{sac:"#241C15",stil:"kisa",sakal:1} },
-    { ad:"Mirel Rădoi",       kulup:"Gaziantep FK",    bas:"2026-04-22", h:"gun", yuz:{sac:"#241C15",stil:"kisa",ten:"#EFC49F"} },
-    { ad:"Metin Diyadin",     kulup:"Gençlerbirliği",  bas:"2026-05-05", h:"gun", yuz:{sac:"#7E7A74",stil:"seyrek",sakal:1},
-      not:"Aynı kulüpteki <em>3. dönemi</em> — Gençlerbirliği geçen sezon 6 hoca değiştirip rekor kırdı" },
-    { ad:"Vincenzo Italiano", kulup:"Beşiktaş",        bas:"2026-06-05", h:"gun", yuz:{sac:"#2B2119",stil:"kisa",sakal:1,ten:"#EFC49F"} },
-    { ad:"Besnik Hasi",       kulup:"Amedspor",        bas:"2026-06-10", h:"gun", yuz:{sac:"#3A3129",stil:"seyrek",ten:"#EFC49F"} },
-    { ad:"İsmail Kartal",     kulup:"Fenerbahçe",      bas:"2026-06-18", h:"gun", yuz:{sac:"#B9B4AE",stil:"seyrek"} },
-    { ad:"Özhan Pulat",       kulup:"Eyüpspor",        bas:"2026-06-29", h:"gun", yuz:{sac:"#241C15",stil:"kisa",sakal:1} }
+    { ad:"Stanimir Stoilov", kulup:"Göztepe", bas:"2023-11-21", h:"gun", yuz:{sac:"#8C8C8C",stil:"seyrek",ten:"#EFC49F"} },
+    { ad:"Fatih Tekke", kulup:"Trabzonspor", bas:"2025-03-11", h:"gun", yuz:{sac:"#241C15",stil:"kisa",sakal:1} },
+    { ad:"João Pereira", kulup:"Alanyaspor", bas:"2025-03-22", h:"gun", yuz:{sac:"#231A12",stil:"kisa",sakal:1} },
+    { ad:"Selçuk İnan", kulup:"Kocaelispor", bas:"2025-06-03", h:"gun", yuz:{sac:"#1E1712",stil:"kisa",sakal:1} },
+    { ad:"Serkan Özbalta", kulup:"Erzurumspor FK", bas:"2025-07-01", h:"gun", yuz:{sac:"#2A211A",stil:"kisa"} },
+    { ad:"Nuri Şahin", kulup:"Başakşehir", bas:"2025-09-15", h:"gun", yuz:{sac:"#1E1712",stil:"kisa",sakal:1} },
+    { ad:"Recep Uçar", kulup:"Çaykur Rizespor", bas:"2025-12-03", h:"gun", yuz:{sac:"#2A211A",stil:"kisa"} },
+    { ad:"Emre Belözoğlu", kulup:"Kasımpaşa", bas:"2025-12-05", h:"gun", yuz:{sac:"#1E1712",stil:"kisa"} },
+    { ad:"İlhan Palut", kulup:"Konyaspor", bas:"2026-02-06", h:"gun", yuz:{sac:"#2A211A",stil:"kisa",sakal:1},
+      not:"Konyaspor'daki <em>2. dönemi</em> — ilki 2021-2023" },
+    { ad:"Thorsten Fink", kulup:"Samsunspor", bas:"2026-02-16", h:"gun", yuz:{sac:"#9A9A96",stil:"kisa",ten:"#F0CDAE"} },
+    { ad:"Uğur Uçar", kulup:"Çorum FK", bas:"2026-02-17", h:"gun", yuz:{sac:"#241C15",stil:"kisa",sakal:1} },
+    { ad:"Mirel Rădoi", kulup:"Gaziantep FK", bas:"2026-04-22", h:"gun", yuz:{sac:"#241C15",stil:"kisa",ten:"#EFC49F"} },
+    { ad:"Metin Diyadin", kulup:"Gençlerbirliği", bas:"2026-05-05", h:"gun", yuz:{sac:"#7E7A74",stil:"seyrek",sakal:1},
+      not:"Aynı kulüpteki <em>3. dönemi</em> — Gençlerbirliği geçen sezon 6 hoca değiştirdi" },
+    { ad:"Vincenzo Italiano", kulup:"Beşiktaş", bas:"2026-06-05", h:"gun", yuz:{sac:"#2B2119",stil:"kisa",sakal:1,ten:"#EFC49F"} },
+    { ad:"Besnik Hasi", kulup:"Amedspor", bas:"2026-06-10", h:"gun", yuz:{sac:"#3A3129",stil:"seyrek",ten:"#EFC49F"} },
+    { ad:"İsmail Kartal", kulup:"Fenerbahçe", bas:"2026-06-18", h:"gun", yuz:{sac:"#B9B4AE",stil:"seyrek"} },
+    { ad:"Özhan Pulat", kulup:"Eyüpspor", bas:"2026-06-29", h:"gun", yuz:{sac:"#241C15",stil:"kisa",sakal:1} }
   ];
 
   var BK = [
-    { ad:"Hasan Çavuşoğlu",  kulup:"Alanyaspor",      bas:"2011-07-01", h:"yil", yuz:{sac:"#9A958E",stil:"seyrek"} },
-    { ad:"Göksel Gümüşdağ",  kulup:"Başakşehir",      bas:"2014-07-01", h:"yil", yuz:{sac:"#3A322A",stil:"kisa"} },
-    { ad:"Yüksel Yıldırım",  kulup:"Samsunspor",      bas:"2018-07-01", h:"yil", yuz:{sac:"#5A524A",stil:"seyrek"} },
-    { ad:"Murat Özkaya",     kulup:"Eyüpspor",        bas:"2019-07-01", h:"yil", yuz:{sac:"#3A322A",stil:"kisa"},
-      not:"Kulüp <em>TMSF kayyum yönetiminde</em> — Özkaya ünvanen başkan" },
-    { ad:"Dursun Özbek",     kulup:"Galatasaray",     bas:"2022-06-11", h:"gun", yuz:{sac:"#C8C4BE",stil:"seyrek"},
-      not:"Önceki dönem <em>2015-2018</em> — ayrı sayılır" },
-    { ad:"Memik Yılmaz",     kulup:"Gaziantep FK",    bas:"2023-02-04", h:"gun", yuz:{sac:"#4A4238",stil:"kisa"},
-      not:"26.06.2026'da <em>3. kez</em> seçildi — sayaç sıfırlanmadı" },
-    { ad:"Ertuğrul Doğan",   kulup:"Trabzonspor",     bas:"2023-03-26", h:"gun", yuz:{sac:"#4A4238",stil:"kisa"},
-      not:"01.12.2024'te yeniden seçildi — sayaç sıfırlanmadı" },
-    { ad:"Recep Durul",      kulup:"Kocaelispor",     bas:"2024-07-01", h:"yil", yuz:{sac:"#5A524A",stil:"kisa"},
-      not:"24.05.2026'da yeniden seçildi — sayaç sıfırlanmadı" },
-    { ad:"Serdal Adalı",     kulup:"Beşiktaş",        bas:"2024-12-29", h:"gun", yuz:{sac:"#6E665C",stil:"seyrek"},
-      not:"Mayıs 2025'te güven tazeledi — sayaç sıfırlanmadı" },
-    { ad:"Ömer Atiker",      kulup:"Konyaspor",       bas:"2025-06-01", h:"ay",  yuz:{sac:"#3A322A",stil:"kisa"} },
-    { ad:"Nahit Eren",       kulup:"Amedspor",        bas:"2025-10-15", h:"ay",  yuz:{sac:"#7E7A74",stil:"seyrek"},
-      not:"01.06.2026'da yeniden seçildi — sayaç sıfırlanmadı" },
+    { ad:"Hasan Çavuşoğlu", kulup:"Alanyaspor", bas:"2011-07-01", h:"yil", yuz:{sac:"#9A958E",stil:"seyrek"} },
+    { ad:"Göksel Gümüşdağ", kulup:"Başakşehir", bas:"2014-07-01", h:"yil", yuz:{sac:"#3A322A",stil:"kisa"} },
+    { ad:"Yüksel Yıldırım", kulup:"Samsunspor", bas:"2018-07-01", h:"yil", yuz:{sac:"#5A524A",stil:"seyrek"} },
+    { ad:"Murat Özkaya", kulup:"Eyüpspor", bas:"2019-07-01", h:"yil", yuz:{sac:"#3A322A",stil:"kisa"},
+      not:"Kulüp <em>TMSF kayyum yönetiminde</em>" },
+    { ad:"Dursun Özbek", kulup:"Galatasaray", bas:"2022-06-11", h:"gun", yuz:{sac:"#C8C4BE",stil:"seyrek"},
+      not:"Önceki dönemi <em>2015-2018</em>" },
+    { ad:"Memik Yılmaz", kulup:"Gaziantep FK", bas:"2023-02-04", h:"gun", yuz:{sac:"#4A4238",stil:"kisa"},
+      not:"26.06.2026'da <em>3. kez</em> seçildi" },
+    { ad:"Ertuğrul Doğan", kulup:"Trabzonspor", bas:"2023-03-26", h:"gun", yuz:{sac:"#4A4238",stil:"kisa"},
+      not:"01.12.2024'te yeniden seçildi" },
+    { ad:"Recep Durul", kulup:"Kocaelispor", bas:"2024-07-01", h:"yil", yuz:{sac:"#5A524A",stil:"kisa"},
+      not:"24.05.2026'da yeniden seçildi" },
+    { ad:"Serdal Adalı", kulup:"Beşiktaş", bas:"2024-12-29", h:"gun", yuz:{sac:"#6E665C",stil:"seyrek"},
+      not:"Mayıs 2025'te güven tazeledi" },
+    { ad:"Ömer Atiker", kulup:"Konyaspor", bas:"2025-06-01", h:"ay", yuz:{sac:"#3A322A",stil:"kisa"} },
+    { ad:"Nahit Eren", kulup:"Amedspor", bas:"2025-10-15", h:"ay", yuz:{sac:"#7E7A74",stil:"seyrek"},
+      not:"01.06.2026'da yeniden seçildi" },
     { ad:"Ali Zeki Saruhan", kulup:"Çaykur Rizespor", bas:"2026-06-04", h:"gun", yuz:{sac:"#4A4238",stil:"kisa"} },
-    { ad:"Aziz Yıldırım",    kulup:"Fenerbahçe",      bas:"2026-06-07", h:"gun", yuz:{sac:"#B0ABA4",stil:"seyrek"},
-      not:"Önceki dönem <em>1998-2018</em> — ayrı sayılır" },
-    { ad:"Savaş Balçık",     kulup:"Çorum FK",        bas:"2026-07-01", h:"ay",  yuz:{sac:"#3A322A",stil:"kisa"} }
+    { ad:"Aziz Yıldırım", kulup:"Fenerbahçe", bas:"2026-06-07", h:"gun", yuz:{sac:"#B0ABA4",stil:"seyrek"},
+      not:"Önceki dönemi <em>1998-2018</em> — 20 yıl" },
+    { ad:"Savaş Balçık", kulup:"Çorum FK", bas:"2026-07-01", h:"ay", yuz:{sac:"#3A322A",stil:"kisa"} }
   ];
 
-  /* Tüm zamanların rekorları — aralıksız tek dönem */
+  var BK_DIGER = [
+    { ad:"Haydar Arda Çakmak", kulup:"Gençlerbirliği" },
+    { ad:"Ahmet Dal", kulup:"Erzurumspor FK" },
+    { ad:"Rasmus Ankersen", kulup:"Göztepe" },
+    { ad:"Davut Dişli", kulup:"Kasımpaşa" }
+  ];
+
   var REKOR = {
     td: { ad:"Gordon Milne", kulup:"Beşiktaş", donem:"1987-1994", sure:"6 yıl 6 ay", gun:2374,
-          aciklama:"Süper Lig tarihinde aynı takımı aralıksız en uzun süre çalıştıran teknik direktör" },
+          aciklama:"Süper Lig'de aynı takımı aralıksız en uzun süre çalıştıran teknik direktör" },
     bk: { ad:"Aziz Yıldırım", kulup:"Fenerbahçe", donem:"1998-2018", sure:"20 yıl", gun:7305,
-          aciklama:"Türk futbolunda bir kulübü aralıksız en uzun süre yöneten başkan" }
+          aciklama:"Bir kulübü aralıksız en uzun süre yöneten başkan" }
   };
 
-  var BK_TARIHSIZ = [
-    { ad:"Haydar Arda Çakmak", kulup:"Gençlerbirliği",
-      not:"25.07.2026'da <em>yeniden</em> seçildi — ilk dönem başlangıcı doğrulanamadı" },
-    { ad:"Ahmet Dal",          kulup:"Erzurumspor FK", not:"Mayıs 2026 itibarıyla görevde" },
-    { ad:"Rasmus Ankersen",    kulup:"Göztepe",        not:"Göreve başlama tarihi doğrulanamadı" },
-    { ad:"Davut Dişli",        kulup:"Kasımpaşa",      not:"Kazancı Holding devri sonrası — tarih doğrulanamadı" }
-  ];
-
-  function hashKod(s) {
-    var h = 0, i;
-    for (i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
-    return h;
-  }
+  /* ================= ÇİZİM ================= */
+  function hashKod(s) { var h=0,i; for(i=0;i<s.length;i++) h=((h<<5)-h+s.charCodeAt(i))|0; return h; }
 
   function yuzSVG(kisi, boyut, tac) {
-    var y = kisi.yuz || {};
-    var ten  = y.ten || "#E3B189";
-    var sac  = y.sac || "#2B2118";
-    var stil = y.stil || "kisa";
-    var c    = RENK[kisi.kulup] || ["#3A4A44", "#7C8F86"];
-    var id   = "c" + Math.abs(hashKod(kisi.ad + kisi.kulup));
-
-    var sacPath = stil === "kisa"
-      ? '<path d="M17 27 Q17 10 32 10 Q47 10 47 27 Q43 19 32 19 Q21 19 17 27 Z" fill="' + sac + '"/>'
-      : '<path d="M17 29 Q17 14 25 12 Q22 18 21 27 Z" fill="' + sac + '"/>' +
-        '<path d="M47 29 Q47 14 39 12 Q42 18 43 27 Z" fill="' + sac + '"/>' +
-        '<path d="M23.5 15.5 Q32 11.5 40.5 15.5 Q32 13.5 23.5 15.5 Z" fill="' + sac + '" opacity=".75"/>';
-
-    var sakal = y.sakal
-      ? '<path d="M20 33 Q20 47 32 49 Q44 47 44 33 Q41 42 32 42 Q23 42 20 33 Z" fill="' + sac + '" opacity=".85"/>'
-      : '';
-
-    return '<svg viewBox="0 0 64 64" width="' + boyut + '" height="' + boyut + '" aria-hidden="true">' +
-      '<defs><clipPath id="' + id + '"><circle cx="32" cy="32" r="32"/></clipPath></defs>' +
-      '<g clip-path="url(#' + id + ')">' +
-        '<rect width="64" height="64" fill="' + c[0] + '"/>' +
-        '<path d="M0 64 L0 46 Q32 34 64 46 L64 64 Z" fill="' + c[1] + '"/>' +
-        '<path d="M26 40 h12 v10 h-12 z" fill="' + ten + '"/>' +
-        '<circle cx="17" cy="30" r="3.4" fill="' + ten + '"/>' +
-        '<circle cx="47" cy="30" r="3.4" fill="' + ten + '"/>' +
-        '<ellipse cx="32" cy="29" rx="14.5" ry="16" fill="' + ten + '"/>' +
-        sakal + sacPath +
-        '<path d="M24 29 q3.2 -3.4 6.4 0" stroke="#241A12" stroke-width="1.9" fill="none" stroke-linecap="round"/>' +
-        '<path d="M33.6 29 q3.2 -3.4 6.4 0" stroke="#241A12" stroke-width="1.9" fill="none" stroke-linecap="round"/>' +
-        '<path d="M23.5 23.5 q3.5 -2 7 -.4" stroke="' + sac + '" stroke-width="1.7" fill="none" stroke-linecap="round"/>' +
-        '<path d="M33.5 23.1 q3.5 -1.6 7 .4" stroke="' + sac + '" stroke-width="1.7" fill="none" stroke-linecap="round"/>' +
-        '<path d="M25 35 q7 7 14 0" stroke="#241A12" stroke-width="2" fill="none" stroke-linecap="round"/>' +
-      '</g>' +
-      '<circle cx="32" cy="32" r="31" fill="none" stroke="rgba(0,0,0,.28)" stroke-width="2"/>' +
-      (tac
-        ? '<g>' +
-            '<path d="M23 15.5 L23 5.5 L28 10 L32 3 L36 10 L41 5.5 L41 15.5 Z" ' +
-              'fill="#FBB800" stroke="#7A4E00" stroke-width="1.1" stroke-linejoin="round"/>' +
-            '<rect x="23" y="14" width="18" height="2.6" rx="1" fill="#E09400" stroke="#7A4E00" stroke-width=".8"/>' +
-            '<circle cx="23" cy="5.5" r="1.5" fill="#FFDA7A" stroke="#7A4E00" stroke-width=".7"/>' +
-            '<circle cx="32" cy="3"   r="1.7" fill="#FFDA7A" stroke="#7A4E00" stroke-width=".7"/>' +
-            '<circle cx="41" cy="5.5" r="1.5" fill="#FFDA7A" stroke="#7A4E00" stroke-width=".7"/>' +
-          '</g>'
-        : '') +
+    var y=kisi.yuz||{}, ten=y.ten||"#E3B189", sac=y.sac||"#2B2118", stil=y.stil||"kisa";
+    var c=RENK[kisi.kulup]||["#3A4A44","#7C8F86"];
+    var id="c"+Math.abs(hashKod(kisi.ad+kisi.kulup));
+    var sacPath = stil==="kisa"
+      ? '<path d="M17 27 Q17 10 32 10 Q47 10 47 27 Q43 19 32 19 Q21 19 17 27 Z" fill="'+sac+'"/>'
+      : '<path d="M17 29 Q17 14 25 12 Q22 18 21 27 Z" fill="'+sac+'"/>'+
+        '<path d="M47 29 Q47 14 39 12 Q42 18 43 27 Z" fill="'+sac+'"/>'+
+        '<path d="M23.5 15.5 Q32 11.5 40.5 15.5 Q32 13.5 23.5 15.5 Z" fill="'+sac+'" opacity=".75"/>';
+    var sakal = y.sakal ? '<path d="M20 33 Q20 47 32 49 Q44 47 44 33 Q41 42 32 42 Q23 42 20 33 Z" fill="'+sac+'" opacity=".85"/>' : '';
+    return '<svg viewBox="0 0 64 64" width="'+boyut+'" height="'+boyut+'" aria-hidden="true">'+
+      '<defs><clipPath id="'+id+'"><circle cx="32" cy="32" r="32"/></clipPath></defs>'+
+      '<g clip-path="url(#'+id+')">'+
+        '<rect width="64" height="64" fill="'+c[0]+'"/>'+
+        '<path d="M0 64 L0 46 Q32 34 64 46 L64 64 Z" fill="'+c[1]+'"/>'+
+        '<path d="M26 40 h12 v10 h-12 z" fill="'+ten+'"/>'+
+        '<circle cx="17" cy="30" r="3.4" fill="'+ten+'"/><circle cx="47" cy="30" r="3.4" fill="'+ten+'"/>'+
+        '<ellipse cx="32" cy="29" rx="14.5" ry="16" fill="'+ten+'"/>'+ sakal + sacPath +
+        '<path d="M24 29 q3.2 -3.4 6.4 0" stroke="#241A12" stroke-width="1.9" fill="none" stroke-linecap="round"/>'+
+        '<path d="M33.6 29 q3.2 -3.4 6.4 0" stroke="#241A12" stroke-width="1.9" fill="none" stroke-linecap="round"/>'+
+        '<path d="M23.5 23.5 q3.5 -2 7 -.4" stroke="'+sac+'" stroke-width="1.7" fill="none" stroke-linecap="round"/>'+
+        '<path d="M33.5 23.1 q3.5 -1.6 7 .4" stroke="'+sac+'" stroke-width="1.7" fill="none" stroke-linecap="round"/>'+
+        '<path d="M25 35 q7 7 14 0" stroke="#241A12" stroke-width="2" fill="none" stroke-linecap="round"/>'+
+      '</g>'+
+      '<circle cx="32" cy="32" r="31" fill="none" stroke="rgba(0,0,0,.28)" stroke-width="2"/>'+
+      (tac ? '<g><path d="M23 15.5 L23 5.5 L28 10 L32 3 L36 10 L41 5.5 L41 15.5 Z" fill="#FBB800" stroke="#7A4E00" stroke-width="1.1" stroke-linejoin="round"/>'+
+             '<rect x="23" y="14" width="18" height="2.6" rx="1" fill="#E09400" stroke="#7A4E00" stroke-width=".8"/>'+
+             '<circle cx="23" cy="5.5" r="1.5" fill="#FFDA7A" stroke="#7A4E00" stroke-width=".7"/>'+
+             '<circle cx="32" cy="3" r="1.7" fill="#FFDA7A" stroke="#7A4E00" stroke-width=".7"/>'+
+             '<circle cx="41" cy="5.5" r="1.5" fill="#FFDA7A" stroke="#7A4E00" stroke-width=".7"/></g>' : '')+
     '</svg>';
   }
 
-  function tarih(s) { return new Date(s + "T12:00:00"); }
-
+  /* ================= SÜRE ================= */
+  function tarih(s){ return new Date(s+"T12:00:00"); }
   function ymd(bas, simdi) {
-    var y = simdi.getFullYear() - bas.getFullYear();
-    var a = simdi.getMonth() - bas.getMonth();
-    var g = simdi.getDate() - bas.getDate();
-    if (g < 0) { a--; g += new Date(simdi.getFullYear(), simdi.getMonth(), 0).getDate(); }
-    if (a < 0) { y--; a += 12; }
-    return { y: y, a: a, g: g };
+    var y=simdi.getFullYear()-bas.getFullYear(), a=simdi.getMonth()-bas.getMonth(), g=simdi.getDate()-bas.getDate();
+    if(g<0){ a--; g+=new Date(simdi.getFullYear(),simdi.getMonth(),0).getDate(); }
+    if(a<0){ y--; a+=12; }
+    return {y:y,a:a,g:g};
   }
-
   function saatKismi(bas, simdi) {
-    var kalan = (simdi - bas) % 86400000;
-    return String(Math.floor(kalan / 3600000)).padStart(2, "0") + ":" +
-           String(Math.floor(kalan % 3600000 / 60000)).padStart(2, "0") + ":" +
-           String(Math.floor(kalan % 60000 / 1000)).padStart(2, "0");
+    var k=(simdi-bas)%86400000;
+    return String(Math.floor(k/3600000)).padStart(2,"0")+":"+String(Math.floor(k%3600000/60000)).padStart(2,"0")+":"+String(Math.floor(k%60000/1000)).padStart(2,"0");
   }
-
   function sureMetni(k, now) {
-    var d = ymd(k.basDate, now), p = [];
-    if (d.y) p.push(d.y + " yıl");
-    if (d.a) p.push(d.a + " ay");
-    p.push(d.g + " gün");
-    return (k.h === "gun" ? "" : "≈ ") + p.join(" ");
+    var d=ymd(k.basDate,now), p=[];
+    if(d.y) p.push(d.y+" yıl");
+    if(d.a) p.push(d.a+" ay");
+    p.push(d.g+" gün");
+    return (k.h==="gun"?"":"≈ ")+p.join(" ");
   }
-
-  function trTarih(d) {
-    return String(d.getDate()).padStart(2, "0") + "." +
-           String(d.getMonth() + 1).padStart(2, "0") + "." + d.getFullYear();
-  }
-
+  function trTarih(d){ return String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")+"."+d.getFullYear(); }
   function tarihEtiket(k) {
-    if (k.h === "gun") return trTarih(k.basDate) + "'ten beri";
-    if (k.h === "ay")  return "≈ " + k.basDate.toLocaleDateString("tr-TR", { month: "long", year: "numeric" }) + "'ten beri";
-    return "≈ " + k.basDate.getFullYear() + "'ten beri";
+    if(k.h==="gun") return trTarih(k.basDate)+"'ten beri";
+    if(k.h==="ay")  return "≈ "+k.basDate.toLocaleDateString("tr-TR",{month:"long",year:"numeric"})+"'ten beri";
+    return "≈ "+k.basDate.getFullYear()+"'ten beri";
   }
 
-  var listEl   = document.getElementById("list");
-  var recordEl = document.getElementById("record");
-  var statsEl  = document.getElementById("stats");
-  var tailEl   = document.getElementById("tailBox");
-  var titleEl  = document.getElementById("boardTitle");
-  var noteEl   = document.getElementById("boardNote");
-  var vsEl     = document.getElementById("versus");
+  /* ================= TABELA ================= */
+  var listEl=document.getElementById("list"), recordEl=document.getElementById("record"),
+      statsEl=document.getElementById("stats"), tailEl=document.getElementById("tailBox"),
+      titleEl=document.getElementById("boardTitle"), noteEl=document.getElementById("boardNote"),
+      vsEl=document.getElementById("versus");
 
-  function hazirla(kaynak) {
-    return kaynak.map(function (k) {
-      var o = {}; for (var x in k) o[x] = k[x];
-      o.basDate = tarih(k.bas);
-      return o;
-    }).sort(function (a, b) { return a.basDate - b.basDate; });
+  function hazirla(src){
+    return src.map(function(k){ var o={}; for(var x in k) o[x]=k[x]; o.basDate=tarih(k.bas); return o; })
+              .sort(function(a,b){ return a.basDate-b.basDate; });
   }
+  var TD_S=hazirla(TD), BK_S=hazirla(BK), aktif=TD_S;
+  function gunSayisi(k,now){ return Math.floor((now-k.basDate)/86400000); }
 
-  var TD_S = hazirla(TD), BK_S = hazirla(BK);
-  var aktif = TD_S;
-
-  function gunSayisi(k, now) { return Math.floor((now - k.basDate) / 86400000); }
-
-  (function () {
-    var now = new Date();
-    var ortTD = Math.round(TD_S.reduce(function (a, k) { return a + gunSayisi(k, now); }, 0) / TD_S.length);
-    var ortBK = Math.round(BK_S.reduce(function (a, k) { return a + gunSayisi(k, now); }, 0) / BK_S.length);
+  (function(){
+    var now=new Date();
+    var oT=Math.round(TD_S.reduce(function(a,k){return a+gunSayisi(k,now);},0)/TD_S.length);
+    var oB=Math.round(BK_S.reduce(function(a,k){return a+gunSayisi(k,now);},0)/BK_S.length);
     vsEl.innerHTML =
-      '<div class="side"><span class="k">Hoca ortalaması</span><span class="v">' +
-        ortTD.toLocaleString("tr-TR") + '<small> gün</small></span></div>' +
-      '<div class="mid">karşı</div>' +
-      '<div class="side"><span class="k">Başkan ortalaması</span><span class="v">' +
-        ortBK.toLocaleString("tr-TR") + '<small> gün</small></span></div>';
+      '<div class="side"><span class="k">Hoca ortalaması</span><span class="v">'+oT.toLocaleString("tr-TR")+'<small> gün</small></span></div>'+
+      '<div class="mid">karşı</div>'+
+      '<div class="side"><span class="k">Başkan ortalaması</span><span class="v">'+oB.toLocaleString("tr-TR")+'<small> gün</small></span></div>';
   })();
 
-  function kutu(k, v, birim) {
-    return '<div class="stat"><span class="k">' + k + '</span><span class="v">' + v + '<small> ' + birim + '</small></span></div>';
-  }
+  function kutu(k,v,b){ return '<div class="stat"><span class="k">'+k+'</span><span class="v">'+v+'<small> '+b+'</small></span></div>'; }
 
   function ciz(rol) {
-    aktif = rol === "td" ? TD_S : BK_S;
-    var now = new Date();
-    var gunler = aktif.map(function (k) { return gunSayisi(k, now); });
-    var ort = Math.round(gunler.reduce(function (a, b) { return a + b; }, 0) / gunler.length);
-    var birim = rol === "td" ? "hoca" : "başkan";
+    aktif = rol==="td" ? TD_S : BK_S;
+    var now=new Date();
+    var gunler=aktif.map(function(k){return gunSayisi(k,now);});
+    var ort=Math.round(gunler.reduce(function(a,b){return a+b;},0)/gunler.length);
+    var birim = rol==="td" ? "hoca" : "başkan";
 
-    titleEl.textContent = rol === "td" ? "Koltukta kim ne kadar dayandı?" : "Başkanlıkta kim ne kadar dayandı?";
-    noteEl.innerHTML = rol === "td"
-      ? "Süper Lig'in 18 teknik direktörü, en uzun süredir görevde olandan başlayarak. <b>18/18 tarih gün bazında doğrulandı.</b>"
-      : "Kulüp başkanlarının <b>kesintisiz</b> görev süresi — yeniden seçilmek sayacı sıfırlamaz. <b>18/18 başkan bulundu</b>, 14'ünün başlangıcı tarihlendirilebildi.";
+    titleEl.textContent = rol==="td" ? "Koltukta kim ne kadar dayandı?" : "Başkanlıkta kim ne kadar dayandı?";
+    noteEl.textContent  = rol==="td"
+      ? "Süper Lig'in 18 teknik direktörü, en uzun süredir görevde olandan başlayarak."
+      : "Kulüp başkanlarının kesintisiz görev süresi. Yeniden seçilmek sayacı sıfırlamaz.";
 
-    statsEl.innerHTML =
-      kutu("En uzun süredir görevde", gunler[0].toLocaleString("tr-TR"), "gün") +
-      kutu("Ortalama görev süresi", ort.toLocaleString("tr-TR"), "gün") +
-      kutu("1 yıldan yeni", gunler.filter(function (g) { return g < 365; }).length, birim) +
-      kutu("6 aydan yeni", gunler.filter(function (g) { return g < 183; }).length, birim);
-
-    // tüm zamanların rekoru + zirvedekinin rekora uzaklığı
-    var R = REKOR[rol];
-    var L = aktif[0];
-    var lider = gunler[0];
-    var yuzde = Math.min(100, Math.round(lider / R.gun * 1000) / 10);
-    var kalan = Math.max(0, R.gun - lider);
-    var kalanYil = Math.floor(kalan / 365);
-    var kalanAy  = Math.round((kalan % 365) / 30.44);
-    var kalanTxt = kalan === 0 ? "rekor kırıldı"
-                 : (kalanYil ? kalanYil + " yıl " : "") + kalanAy + " ay";
+    var R=REKOR[rol], L=aktif[0], lider=gunler[0];
+    var yuzde=Math.min(100, Math.round(lider/R.gun*1000)/10);
+    var kalan=Math.max(0, R.gun-lider);
+    var kY=Math.floor(kalan/365), kA=Math.round((kalan%365)/30.44);
+    var kalanTxt = kalan===0 ? "rekor kırıldı" : (kY?kY+" yıl ":"")+kA+" ay";
 
     recordEl.innerHTML =
-      '<div class="hd"><span class="crown">👑</span><span class="chip">Tüm zamanların rekoru</span></div>' +
-      '<div class="txt"><b>' + R.ad + '</b> — ' + R.kulup + ", aralıksız <span class='sure'>" + R.sure +
-        "</span> (" + R.donem + ")<br>" + R.aciklama + '.</div>' +
-      '<div class="bar"><i style="width:' + yuzde + '%"></i></div>' +
-      '<div class="gap">' +
-        '<span>Zirvedeki: <b>' + L.ad + '</b> · rekorun %' + yuzde.toLocaleString("tr-TR") + "'i</span>" +
-        '<span>Rekora kalan: <b>' + kalanTxt + '</b></span>' +
-      '</div>';
+      '<div class="hd"><span class="crown">👑</span><span class="chip">Tüm zamanların rekoru</span></div>'+
+      '<div class="txt"><b>'+R.ad+'</b> — '+R.kulup+", aralıksız <span class='sure'>"+R.sure+"</span> ("+R.donem+")<br>"+R.aciklama+'.</div>'+
+      '<div class="bar"><i style="width:'+yuzde+'%"></i></div>'+
+      '<div class="gap"><span>Zirvedeki: <b>'+L.ad+"</b> · rekorun %"+yuzde.toLocaleString("tr-TR")+"'i</span>"+
+        '<span>Rekora kalan: <b>'+kalanTxt+'</b></span></div>';
 
-    listEl.innerHTML = "";
-    aktif.forEach(function (k, i) {
-      var li = document.createElement("li");
-      li.className = "person" + (i === 0 ? " top" : "");
+    statsEl.innerHTML =
+      kutu("En uzun süredir görevde", gunler[0].toLocaleString("tr-TR"), "gün")+
+      kutu("Ortalama görev süresi", ort.toLocaleString("tr-TR"), "gün")+
+      kutu("1 yıldan yeni", gunler.filter(function(g){return g<365;}).length, birim)+
+      kutu("6 aydan yeni", gunler.filter(function(g){return g<183;}).length, birim);
+
+    listEl.innerHTML="";
+    aktif.forEach(function(k,i){
+      var li=document.createElement("li");
+      li.className="person"+(i===0?" top":"");
       li.innerHTML =
-        '<span class="rank">' + (i + 1) + '</span>' +
-        yuzSVG(k, 42, i === 0) +
-        '<div class="who">' +
-          '<div class="nm">' + k.ad + (k.h === "gun" ? "" : ' <span class="chip soft">yaklaşık</span>') + '</div>' +
-          '<div class="cl">' + k.kulup + ' · ' + tarihEtiket(k) + '</div>' +
-          (k.not ? '<div class="sub">' + k.not + '</div>' : '') +
-        '</div>' +
-        '<div class="tick"><span class="big"></span><span class="small"></span></div>';
-      li.dataset.idx = i;
+        '<span class="rank">'+(i+1)+'</span>'+ yuzSVG(k,42,i===0)+
+        '<div class="who"><div class="nm">'+k.ad+'</div>'+
+          '<div class="cl">'+k.kulup+' · '+tarihEtiket(k)+'</div>'+
+          (k.not?'<div class="sub">'+k.not+'</div>':'')+
+        '</div><div class="tick"><span class="big"></span><span class="small"></span></div>';
+      li.dataset.idx=i;
       listEl.appendChild(li);
     });
 
-    if (rol === "bk") {
-      tailEl.innerHTML =
-        '<div class="subhead">Başlangıcı doğrulanamayan 4 başkan</div>' +
-        '<ol class="board-list">' + BK_TARIHSIZ.map(function (b) {
-          return '<li class="person nodate">' +
-            '<span class="rank">—</span>' +
-            yuzSVG({ ad: b.ad, kulup: b.kulup, yuz: { stil: "kisa", sac: "#4A4238" } }, 42) +
-            '<div class="who"><div class="nm">' + b.ad + ' <span class="chip warn">tarih aranıyor</span></div>' +
-            '<div class="cl">' + b.kulup + '</div>' +
-            '<div class="sub">' + b.not + '</div></div>' +
-            '<div class="tick"><span class="big" style="color:var(--muted)">—</span></div>' +
-          '</li>';
-        }).join("") + '</ol>';
-    } else {
-      tailEl.innerHTML = "";
-    }
+    tailEl.innerHTML = rol==="bk"
+      ? '<div class="subhead">Diğer başkanlar</div><ol class="board-list">'+
+        BK_DIGER.map(function(b){
+          return '<li class="person nodate"><span class="rank">—</span>'+
+            yuzSVG({ad:b.ad,kulup:b.kulup,yuz:{stil:"kisa",sac:"#4A4238"}},42)+
+            '<div class="who"><div class="nm">'+b.ad+'</div><div class="cl">'+b.kulup+'</div></div>'+
+            '<div class="tick"><span class="big" style="color:var(--muted)">—</span></div></li>';
+        }).join("")+'</ol>'
+      : "";
 
     tikla();
   }
 
   function tikla() {
-    var now = new Date();
-    listEl.querySelectorAll("li.person").forEach(function (li) {
-      var k = aktif[+li.dataset.idx];
-      li.querySelector(".tick .big").textContent = sureMetni(k, now);
-      li.querySelector(".tick .small").textContent = saatKismi(k.basDate, now);
+    var now=new Date();
+    listEl.querySelectorAll("li.person").forEach(function(li){
+      var k=aktif[+li.dataset.idx];
+      li.querySelector(".tick .big").textContent=sureMetni(k,now);
+      li.querySelector(".tick .small").textContent=saatKismi(k.basDate,now);
     });
   }
 
-  document.querySelectorAll(".roles button").forEach(function (b) {
-    b.addEventListener("click", function () {
-      document.querySelectorAll(".roles button").forEach(function (x) {
-        x.setAttribute("aria-pressed", x === b ? "true" : "false");
+  document.querySelectorAll(".roles button").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.querySelectorAll(".roles button").forEach(function(x){
+        x.setAttribute("aria-pressed", x===b?"true":"false");
       });
       ciz(b.dataset.role);
     });
   });
-
   ciz("td");
-  setInterval(tikla, 1000);
+  setInterval(tikla,1000);
 
-  var tabs = document.querySelectorAll("nav button");
-  tabs.forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      tabs.forEach(function (b) {
-        var sel = b === btn;
-        b.setAttribute("aria-selected", sel ? "true" : "false");
-        document.getElementById(b.getAttribute("aria-controls")).hidden = !sel;
+  var tabs=document.querySelectorAll("nav button");
+  tabs.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      tabs.forEach(function(b){
+        var sel=b===btn;
+        b.setAttribute("aria-selected", sel?"true":"false");
+        document.getElementById(b.getAttribute("aria-controls")).hidden=!sel;
       });
     });
   });
 
-  /* ---------------- BİLMECE ---------------- */
+  /* ================= GÜNÜN FUTBOLCUSU ================= */
   var KITA = {
     "Türkiye":"Avrupa","Brezilya":"Güney Amerika","Romanya":"Avrupa","İspanya":"Avrupa",
     "Portekiz":"Avrupa","Hollanda":"Avrupa","Fildişi Sahili":"Afrika","Kamerun":"Afrika",
-    "Gürcistan":"Avrupa","Uruguay":"Güney Amerika","Çekya":"Avrupa","Fransa":"Avrupa"
+    "Gürcistan":"Avrupa","Uruguay":"Güney Amerika","Çekya":"Avrupa","Fransa":"Avrupa",
+    "Nijerya":"Afrika","Senegal":"Afrika","Bosna-Hersek":"Avrupa","Hırvatistan":"Avrupa",
+    "Sırbistan":"Avrupa","Almanya":"Avrupa","Belçika":"Avrupa","Arjantin":"Güney Amerika",
+    "Kolombiya":"Güney Amerika","İsrail":"Asya","Kanada":"Kuzey Amerika","Fas":"Afrika",
+    "Cezayir":"Afrika","Mısır":"Afrika","Yunanistan":"Avrupa","Kuzey Makedonya":"Avrupa",
+    "Polonya":"Avrupa","Norveç":"Avrupa","Ekvador":"Güney Amerika","İtalya":"Avrupa",
+    "Slovenya":"Avrupa","Karadağ":"Avrupa","Gana":"Afrika","Danimarka":"Avrupa",
+    "İngiltere":"Avrupa","Galler":"Avrupa","İskoçya":"Avrupa","İsveç":"Avrupa",
+    "Güney Kore":"Asya","Japonya":"Asya","Gine":"Afrika","Tunus":"Afrika","Mali":"Afrika",
+    "Avusturya":"Avrupa","İsviçre":"Avrupa","Ukrayna":"Avrupa","Şili":"Güney Amerika",
+    "Paraguay":"Güney Amerika","Meksika":"Kuzey Amerika","ABD":"Kuzey Amerika",
+    "Cape Verde":"Afrika","Kongo DC":"Afrika","Zambiya":"Afrika"
   };
   var HAT = {
     "Kaleci":"Kale","Stoper":"Defans","Sağ Bek":"Defans","Sol Bek":"Defans",
-    "Orta Saha":"Orta Saha","Ofansif Orta Saha":"Orta Saha","Kanat":"Hücum","Forvet":"Hücum"
+    "Orta Saha":"Orta Saha","Ofansif OS":"Orta Saha","Kanat":"Hücum","Forvet":"Hücum"
   };
-  var SEHIR = { "Galatasaray":"İstanbul","Fenerbahçe":"İstanbul","Beşiktaş":"İstanbul","Trabzonspor":"Anadolu" };
+  var SEHIR = { "Galatasaray":"İstanbul","Fenerbahçe":"İstanbul","Beşiktaş":"İstanbul" };
+  var DONEMLER = ["1960'lar","1970'ler","1980'ler","1990'lar","2000'ler","2010'lar","2020'ler"];
 
-  var P = [
-    ["Hakan Şükür","Türkiye","Forvet",1971,"Galatasaray"],
-    ["Alex de Souza","Brezilya","Ofansif Orta Saha",1977,"Fenerbahçe"],
-    ["Mario Jardel","Brezilya","Forvet",1973,"Galatasaray"],
-    ["Rüştü Reçber","Türkiye","Kaleci",1973,"Fenerbahçe"],
-    ["Tugay Kerimoğlu","Türkiye","Orta Saha",1970,"Galatasaray"],
-    ["Bülent Korkmaz","Türkiye","Stoper",1968,"Galatasaray"],
-    ["Gheorghe Popescu","Romanya","Stoper",1967,"Galatasaray"],
-    ["Roberto Carlos","Brezilya","Sol Bek",1973,"Fenerbahçe"],
-    ["Daniel Güiza","İspanya","Forvet",1980,"Fenerbahçe"],
-    ["Bobô","Brezilya","Forvet",1985,"Beşiktaş"],
-    ["Ricardo Quaresma","Portekiz","Kanat",1983,"Beşiktaş"],
-    ["Wesley Sneijder","Hollanda","Ofansif Orta Saha",1984,"Galatasaray"],
-    ["Didier Drogba","Fildişi Sahili","Forvet",1978,"Galatasaray"],
-    ["Robin van Persie","Hollanda","Forvet",1983,"Fenerbahçe"],
-    ["Vincent Aboubakar","Kamerun","Forvet",1992,"Beşiktaş"],
-    ["Emre Belözoğlu","Türkiye","Orta Saha",1980,"Fenerbahçe"],
-    ["Arda Turan","Türkiye","Kanat",1987,"Galatasaray"],
-    ["Semih Şentürk","Türkiye","Forvet",1983,"Fenerbahçe"],
-    ["Fatih Tekke","Türkiye","Forvet",1977,"Trabzonspor"],
-    ["Şota Arveladze","Gürcistan","Forvet",1973,"Trabzonspor"],
-    ["Burak Yılmaz","Türkiye","Forvet",1985,"Galatasaray"],
-    ["Selçuk İnan","Türkiye","Orta Saha",1985,"Galatasaray"],
-    ["Gökhan Gönül","Türkiye","Sağ Bek",1985,"Fenerbahçe"],
-    ["Volkan Demirel","Türkiye","Kaleci",1981,"Fenerbahçe"],
-    ["Mehmet Topal","Türkiye","Orta Saha",1986,"Fenerbahçe"],
-    ["Fernando Muslera","Uruguay","Kaleci",1986,"Galatasaray"],
-    ["Felipe Melo","Brezilya","Orta Saha",1983,"Galatasaray"],
-    ["Elano","Brezilya","Orta Saha",1981,"Galatasaray"],
-    ["Milan Baroš","Çekya","Forvet",1981,"Galatasaray"],
-    ["Nihat Kahveci","Türkiye","Forvet",1979,"Beşiktaş"],
-    ["Sergen Yalçın","Türkiye","Ofansif Orta Saha",1972,"Beşiktaş"],
-    ["Pascal Nouma","Fransa","Forvet",1972,"Beşiktaş"],
-    ["İlhan Mansız","Türkiye","Forvet",1975,"Beşiktaş"],
-    ["Hasan Şaş","Türkiye","Kanat",1976,"Galatasaray"],
-    ["Umut Bulut","Türkiye","Forvet",1983,"Galatasaray"]
-  ].map(function (r) { return { ad:r[0], ulke:r[1], mevki:r[2], dogum:r[3], takim:r[4] }; });
+  // ad, ülke, mevki, doğum yılı, kulüp (en çok anıldığı), Süper Lig dönemi
+  var P_SL = [
+    ["Metin Oktay","Türkiye","Forvet",1936,"Galatasaray","1960'lar"],
+    ["Cemil Turan","Türkiye","Forvet",1947,"Fenerbahçe","1970'ler"],
+    ["Mustafa Denizli","Türkiye","Kanat",1949,"Galatasaray","1970'ler"],
+    ["Şenol Güneş","Türkiye","Kaleci",1952,"Trabzonspor","1970'ler"],
+    ["Tanju Çolak","Türkiye","Forvet",1963,"Galatasaray","1980'ler"],
+    ["Rıdvan Dilmen","Türkiye","Forvet",1962,"Fenerbahçe","1980'ler"],
+    ["Feyyaz Uçar","Türkiye","Forvet",1963,"Beşiktaş","1980'ler"],
+    ["Metin Tekin","Türkiye","Kanat",1964,"Beşiktaş","1980'ler"],
+    ["Ali Gültiken","Türkiye","Forvet",1964,"Beşiktaş","1980'ler"],
+    ["Rıza Çalımbay","Türkiye","Sağ Bek",1963,"Beşiktaş","1980'ler"],
+    ["Oğuz Çetin","Türkiye","Orta Saha",1963,"Fenerbahçe","1980'ler"],
+    ["Aykut Kocaman","Türkiye","Forvet",1965,"Fenerbahçe","1990'lar"],
+    ["Hami Mandıralı","Türkiye","Ofansif OS",1968,"Trabzonspor","1990'lar"],
+    ["Ogün Temizkanoğlu","Türkiye","Stoper",1969,"Trabzonspor","1990'lar"],
+    ["Abdullah Ercan","Türkiye","Orta Saha",1971,"Trabzonspor","1990'lar"],
+    ["Gheorghe Hagi","Romanya","Ofansif OS",1965,"Galatasaray","1990'lar"],
+    ["Gheorghe Popescu","Romanya","Stoper",1967,"Galatasaray","1990'lar"],
+    ["Claudio Taffarel","Brezilya","Kaleci",1966,"Galatasaray","1990'lar"],
+    ["Hakan Şükür","Türkiye","Forvet",1971,"Galatasaray","1990'lar"],
+    ["Bülent Korkmaz","Türkiye","Stoper",1968,"Galatasaray","1990'lar"],
+    ["Tugay Kerimoğlu","Türkiye","Orta Saha",1970,"Galatasaray","1990'lar"],
+    ["Okan Buruk","Türkiye","Kanat",1973,"Galatasaray","1990'lar"],
+    ["Ergün Penbe","Türkiye","Orta Saha",1972,"Galatasaray","2000'ler"],
+    ["Ümit Davala","Türkiye","Sağ Bek",1973,"Galatasaray","2000'ler"],
+    ["Arif Erdem","Türkiye","Forvet",1972,"Galatasaray","1990'lar"],
+    ["Suat Kaya","Türkiye","Orta Saha",1971,"Galatasaray","1990'lar"],
+    ["Hasan Şaş","Türkiye","Kanat",1976,"Galatasaray","2000'ler"],
+    ["Emre Aşık","Türkiye","Stoper",1973,"Galatasaray","2000'ler"],
+    ["Ümit Karan","Türkiye","Forvet",1976,"Galatasaray","2000'ler"],
+    ["Necati Ateş","Türkiye","Forvet",1980,"Galatasaray","2000'ler"],
+    ["Haim Revivo","İsrail","Ofansif OS",1972,"Galatasaray","2000'ler"],
+    ["Mario Jardel","Brezilya","Forvet",1973,"Galatasaray","2000'ler"],
+    ["Alpay Özalan","Türkiye","Stoper",1973,"Beşiktaş","1990'lar"],
+    ["Rüştü Reçber","Türkiye","Kaleci",1973,"Fenerbahçe","2000'ler"],
+    ["Sergen Yalçın","Türkiye","Ofansif OS",1972,"Beşiktaş","2000'ler"],
+    ["İlhan Mansız","Türkiye","Forvet",1975,"Beşiktaş","2000'ler"],
+    ["Nihat Kahveci","Türkiye","Forvet",1979,"Beşiktaş","2000'ler"],
+    ["Pascal Nouma","Fransa","Forvet",1972,"Beşiktaş","2000'ler"],
+    ["Ahmet Dursun","Türkiye","Kanat",1976,"Beşiktaş","2000'ler"],
+    ["Oktay Derelioğlu","Türkiye","Forvet",1975,"Beşiktaş","1990'lar"],
+    ["Tümer Metin","Türkiye","Kanat",1974,"Beşiktaş","2000'ler"],
+    ["Elvir Bolić","Bosna-Hersek","Forvet",1971,"Fenerbahçe","1990'lar"],
+    ["Elvir Baljić","Bosna-Hersek","Forvet",1974,"Fenerbahçe","1990'lar"],
+    ["Jay-Jay Okocha","Nijerya","Ofansif OS",1973,"Fenerbahçe","1990'lar"],
+    ["Uche Okechukwu","Nijerya","Stoper",1967,"Fenerbahçe","1990'lar"],
+    ["Fatih Akyel","Türkiye","Sağ Bek",1977,"Fenerbahçe","2000'ler"],
+    ["Şota Arveladze","Gürcistan","Forvet",1973,"Trabzonspor","2000'ler"],
+    ["Fatih Tekke","Türkiye","Forvet",1977,"Trabzonspor","2000'ler"],
+    ["Alex de Souza","Brezilya","Ofansif OS",1977,"Fenerbahçe","2000'ler"],
+    ["Roberto Carlos","Brezilya","Sol Bek",1973,"Fenerbahçe","2000'ler"],
+    ["Mehmet Aurélio","Brezilya","Orta Saha",1977,"Fenerbahçe","2000'ler"],
+    ["Deivid","Brezilya","Forvet",1979,"Fenerbahçe","2000'ler"],
+    ["Diego Lugano","Uruguay","Stoper",1980,"Fenerbahçe","2000'ler"],
+    ["Daniel Güiza","İspanya","Forvet",1980,"Fenerbahçe","2000'ler"],
+    ["Semih Şentürk","Türkiye","Forvet",1983,"Fenerbahçe","2000'ler"],
+    ["Volkan Demirel","Türkiye","Kaleci",1981,"Fenerbahçe","2000'ler"],
+    ["Selçuk Şahin","Türkiye","Orta Saha",1981,"Fenerbahçe","2000'ler"],
+    ["Emre Belözoğlu","Türkiye","Orta Saha",1980,"Fenerbahçe","2010'lar"],
+    ["Gökhan Gönül","Türkiye","Sağ Bek",1985,"Fenerbahçe","2010'lar"],
+    ["Mehmet Topal","Türkiye","Orta Saha",1986,"Fenerbahçe","2010'lar"],
+    ["Caner Erkin","Türkiye","Sol Bek",1988,"Fenerbahçe","2010'lar"],
+    ["Moussa Sow","Senegal","Forvet",1986,"Fenerbahçe","2010'lar"],
+    ["Dirk Kuyt","Hollanda","Kanat",1980,"Fenerbahçe","2010'lar"],
+    ["Raul Meireles","Portekiz","Orta Saha",1983,"Fenerbahçe","2010'lar"],
+    ["Robin van Persie","Hollanda","Forvet",1983,"Fenerbahçe","2010'lar"],
+    ["Nani","Portekiz","Kanat",1986,"Fenerbahçe","2010'lar"],
+    ["Josef de Souza","Brezilya","Orta Saha",1989,"Fenerbahçe","2010'lar"],
+    ["Mesut Özil","Almanya","Ofansif OS",1988,"Fenerbahçe","2020'ler"],
+    ["Ozan Tufan","Türkiye","Orta Saha",1995,"Fenerbahçe","2010'lar"],
+    ["Enner Valencia","Ekvador","Forvet",1989,"Fenerbahçe","2020'ler"],
+    ["Edin Džeko","Bosna-Hersek","Forvet",1986,"Fenerbahçe","2020'ler"],
+    ["Dušan Tadić","Sırbistan","Kanat",1988,"Fenerbahçe","2020'ler"],
+    ["İrfan Can Kahveci","Türkiye","Ofansif OS",1995,"Fenerbahçe","2020'ler"],
+    ["Ferdi Kadıoğlu","Türkiye","Sol Bek",1999,"Fenerbahçe","2020'ler"],
+    ["Sebastian Szymański","Polonya","Ofansif OS",1999,"Fenerbahçe","2020'ler"],
+    ["Fred","Brezilya","Orta Saha",1993,"Fenerbahçe","2020'ler"],
+    ["Youssef En-Nesyri","Fas","Forvet",1997,"Fenerbahçe","2020'ler"],
+    ["Fernando Muslera","Uruguay","Kaleci",1986,"Galatasaray","2010'lar"],
+    ["Felipe Melo","Brezilya","Orta Saha",1983,"Galatasaray","2010'lar"],
+    ["Selçuk İnan","Türkiye","Orta Saha",1985,"Galatasaray","2010'lar"],
+    ["Burak Yılmaz","Türkiye","Forvet",1985,"Galatasaray","2010'lar"],
+    ["Wesley Sneijder","Hollanda","Ofansif OS",1984,"Galatasaray","2010'lar"],
+    ["Didier Drogba","Fildişi Sahili","Forvet",1978,"Galatasaray","2010'lar"],
+    ["Elano","Brezilya","Orta Saha",1981,"Galatasaray","2010'lar"],
+    ["Milan Baroš","Çekya","Forvet",1981,"Galatasaray","2010'lar"],
+    ["Umut Bulut","Türkiye","Forvet",1983,"Galatasaray","2010'lar"],
+    ["Arda Turan","Türkiye","Kanat",1987,"Galatasaray","2010'lar"],
+    ["Sabri Sarıoğlu","Türkiye","Sağ Bek",1984,"Galatasaray","2010'lar"],
+    ["Hakan Balta","Türkiye","Sol Bek",1983,"Galatasaray","2010'lar"],
+    ["Semih Kaya","Türkiye","Stoper",1991,"Galatasaray","2010'lar"],
+    ["Emre Çolak","Türkiye","Kanat",1991,"Galatasaray","2010'lar"],
+    ["Bafétimbi Gomis","Fransa","Forvet",1985,"Galatasaray","2010'lar"],
+    ["Younès Belhanda","Fas","Ofansif OS",1990,"Galatasaray","2010'lar"],
+    ["Radamel Falcao","Kolombiya","Forvet",1986,"Galatasaray","2020'ler"],
+    ["Ryan Babel","Hollanda","Kanat",1986,"Galatasaray","2010'lar"],
+    ["Mauro Icardi","Arjantin","Forvet",1993,"Galatasaray","2020'ler"],
+    ["Dries Mertens","Belçika","Ofansif OS",1987,"Galatasaray","2020'ler"],
+    ["Lucas Torreira","Uruguay","Orta Saha",1996,"Galatasaray","2020'ler"],
+    ["Kerem Aktürkoğlu","Türkiye","Kanat",1998,"Galatasaray","2020'ler"],
+    ["Barış Alper Yılmaz","Türkiye","Kanat",2000,"Galatasaray","2020'ler"],
+    ["Victor Osimhen","Nijerya","Forvet",1998,"Galatasaray","2020'ler"],
+    ["Bobô","Brezilya","Forvet",1985,"Beşiktaş","2010'lar"],
+    ["Ricardo Quaresma","Portekiz","Kanat",1983,"Beşiktaş","2010'lar"],
+    ["Vincent Aboubakar","Kamerun","Forvet",1992,"Beşiktaş","2010'lar"],
+    ["Mario Gómez","Almanya","Forvet",1985,"Beşiktaş","2010'lar"],
+    ["Cenk Tosun","Türkiye","Forvet",1991,"Beşiktaş","2010'lar"],
+    ["Oğuzhan Özyakup","Türkiye","Orta Saha",1992,"Beşiktaş","2010'lar"],
+    ["Gökhan Töre","Türkiye","Kanat",1992,"Beşiktaş","2010'lar"],
+    ["Atiba Hutchinson","Kanada","Orta Saha",1983,"Beşiktaş","2010'lar"],
+    ["Domagoj Vida","Hırvatistan","Stoper",1989,"Beşiktaş","2020'ler"],
+    ["Anderson Talisca","Brezilya","Ofansif OS",1994,"Beşiktaş","2010'lar"],
+    ["Necip Uysal","Türkiye","Orta Saha",1991,"Beşiktaş","2010'lar"],
+    ["Michy Batshuayi","Belçika","Forvet",1993,"Beşiktaş","2020'ler"],
+    ["Rachid Ghezzal","Cezayir","Kanat",1992,"Beşiktaş","2020'ler"],
+    ["Semih Kılıçsoy","Türkiye","Forvet",2005,"Beşiktaş","2020'ler"],
+    ["Uğurcan Çakır","Türkiye","Kaleci",1996,"Trabzonspor","2020'ler"],
+    ["Abdülkadir Ömür","Türkiye","Ofansif OS",1999,"Trabzonspor","2020'ler"],
+    ["Anthony Nwakaeme","Nijerya","Kanat",1989,"Trabzonspor","2020'ler"],
+    ["Alexander Sørloth","Norveç","Forvet",1995,"Trabzonspor","2020'ler"],
+    ["Anastasios Bakasetas","Yunanistan","Ofansif OS",1993,"Trabzonspor","2020'ler"],
+    ["Enis Bardhi","Kuzey Makedonya","Ofansif OS",1995,"Trabzonspor","2020'ler"],
+    ["Paul Onuachu","Nijerya","Forvet",1994,"Trabzonspor","2020'ler"],
+    ["Yusuf Yazıcı","Türkiye","Ofansif OS",1997,"Trabzonspor","2020'ler"],
+    ["Trézéguet","Mısır","Kanat",1994,"Trabzonspor","2020'ler"],
+    ["Edin Višća","Bosna-Hersek","Kanat",1990,"Başakşehir","2010'lar"],
+    ["Gaël Clichy","Fransa","Sol Bek",1985,"Başakşehir","2010'lar"],
+    ["Robinho","Brezilya","Ofansif OS",1984,"Başakşehir","2010'lar"],
+    ["Demba Ba","Senegal","Forvet",1985,"Başakşehir","2010'lar"],
+    ["Mahmut Tekdemir","Türkiye","Orta Saha",1988,"Başakşehir","2010'lar"],
+    ["Cengiz Ünder","Türkiye","Kanat",1997,"Başakşehir","2010'lar"]
+  ].map(function(r){ return { ad:r[0], ulke:r[1], mevki:r[2], dogum:r[3], takim:r[4], donem:r[5] }; });
 
-  var YIL = new Date().getFullYear();
-  P.forEach(function (p) { p.yas = YIL - p.dogum; });
+  // ad, ülke, mevki, doğum yılı, kulüp, lig, dönem
+  var P_D = [
+    ["Erling Haaland","Norveç","Forvet",2000,"Manchester City","Premier Lig","2020'ler"],
+    ["Mohamed Salah","Mısır","Kanat",1992,"Liverpool","Premier Lig","2020'ler"],
+    ["Bukayo Saka","İngiltere","Kanat",2001,"Arsenal","Premier Lig","2020'ler"],
+    ["Declan Rice","İngiltere","Orta Saha",1999,"Arsenal","Premier Lig","2020'ler"],
+    ["Martin Ødegaard","Norveç","Ofansif OS",1998,"Arsenal","Premier Lig","2020'ler"],
+    ["William Saliba","Fransa","Stoper",2001,"Arsenal","Premier Lig","2020'ler"],
+    ["Cole Palmer","İngiltere","Ofansif OS",2002,"Chelsea","Premier Lig","2020'ler"],
+    ["Enzo Fernández","Arjantin","Orta Saha",2001,"Chelsea","Premier Lig","2020'ler"],
+    ["Nicolas Jackson","Senegal","Forvet",2001,"Chelsea","Premier Lig","2020'ler"],
+    ["Bruno Fernandes","Portekiz","Ofansif OS",1994,"Manchester United","Premier Lig","2020'ler"],
+    ["Marcus Rashford","İngiltere","Kanat",1997,"Manchester United","Premier Lig","2020'ler"],
+    ["Kobbie Mainoo","İngiltere","Orta Saha",2005,"Manchester United","Premier Lig","2020'ler"],
+    ["Virgil van Dijk","Hollanda","Stoper",1991,"Liverpool","Premier Lig","2020'ler"],
+    ["Alisson","Brezilya","Kaleci",1992,"Liverpool","Premier Lig","2020'ler"],
+    ["Rodri","İspanya","Orta Saha",1996,"Manchester City","Premier Lig","2020'ler"],
+    ["Phil Foden","İngiltere","Ofansif OS",2000,"Manchester City","Premier Lig","2020'ler"],
+    ["Ederson","Brezilya","Kaleci",1993,"Manchester City","Premier Lig","2020'ler"],
+    ["Kevin De Bruyne","Belçika","Ofansif OS",1991,"Manchester City","Premier Lig","2010'lar"],
+    ["Son Heung-min","Güney Kore","Forvet",1992,"Tottenham","Premier Lig","2010'lar"],
+    ["Ollie Watkins","İngiltere","Forvet",1995,"Aston Villa","Premier Lig","2020'ler"],
+    ["Alexander Isak","İsveç","Forvet",1999,"Newcastle","Premier Lig","2020'ler"],
+    ["Sandro Tonali","İtalya","Orta Saha",2000,"Newcastle","Premier Lig","2020'ler"],
 
-  var EPOCH = Date.UTC(2026, 0, 1);
-  var gunNo = Math.floor((Date.now() - EPOCH) / 86400000);
-  var hedef = P[((gunNo % P.length) + P.length) % P.length];
-  document.getElementById("puzNo").textContent = "BİLMECE #" + (gunNo + 1);
+    ["Kylian Mbappé","Fransa","Forvet",1998,"Real Madrid","La Liga","2020'ler"],
+    ["Jude Bellingham","İngiltere","Ofansif OS",2003,"Real Madrid","La Liga","2020'ler"],
+    ["Vinícius Júnior","Brezilya","Kanat",2000,"Real Madrid","La Liga","2020'ler"],
+    ["Rodrygo","Brezilya","Kanat",2001,"Real Madrid","La Liga","2020'ler"],
+    ["Thibaut Courtois","Belçika","Kaleci",1992,"Real Madrid","La Liga","2020'ler"],
+    ["Antonio Rüdiger","Almanya","Stoper",1993,"Real Madrid","La Liga","2020'ler"],
+    ["Federico Valverde","Uruguay","Orta Saha",1998,"Real Madrid","La Liga","2020'ler"],
+    ["Aurélien Tchouaméni","Fransa","Orta Saha",2000,"Real Madrid","La Liga","2020'ler"],
+    ["Lamine Yamal","İspanya","Kanat",2007,"Barcelona","La Liga","2020'ler"],
+    ["Robert Lewandowski","Polonya","Forvet",1988,"Barcelona","La Liga","2020'ler"],
+    ["Pedri","İspanya","Orta Saha",2002,"Barcelona","La Liga","2020'ler"],
+    ["Gavi","İspanya","Orta Saha",2004,"Barcelona","La Liga","2020'ler"],
+    ["Frenkie de Jong","Hollanda","Orta Saha",1997,"Barcelona","La Liga","2020'ler"],
+    ["Raphinha","Brezilya","Kanat",1996,"Barcelona","La Liga","2020'ler"],
+    ["Ronald Araújo","Uruguay","Stoper",1999,"Barcelona","La Liga","2020'ler"],
+    ["Antoine Griezmann","Fransa","Forvet",1991,"Atlético Madrid","La Liga","2010'lar"],
+    ["Jan Oblak","Slovenya","Kaleci",1993,"Atlético Madrid","La Liga","2010'lar"],
+    ["Julián Álvarez","Arjantin","Forvet",2000,"Atlético Madrid","La Liga","2020'ler"],
+    ["Nico Williams","İspanya","Kanat",2002,"Athletic Bilbao","La Liga","2020'ler"],
 
-  var tahminler = [], bitti = false, MAX = 6;
-  var boardEl = document.getElementById("board");
-  var inputEl = document.getElementById("guess");
-  var suggEl  = document.getElementById("sugg");
+    ["Lautaro Martínez","Arjantin","Forvet",1997,"Inter","Serie A","2020'ler"],
+    ["Nicolò Barella","İtalya","Orta Saha",1997,"Inter","Serie A","2020'ler"],
+    ["Rafael Leão","Portekiz","Kanat",1999,"Milan","Serie A","2020'ler"],
+    ["Mike Maignan","Fransa","Kaleci",1995,"Milan","Serie A","2020'ler"],
+    ["Dušan Vlahović","Sırbistan","Forvet",2000,"Juventus","Serie A","2020'ler"],
+    ["Federico Chiesa","İtalya","Kanat",1997,"Juventus","Serie A","2020'ler"],
+    ["Paulo Dybala","Arjantin","Ofansif OS",1993,"Roma","Serie A","2020'ler"],
+    ["Khvicha Kvaratskhelia","Gürcistan","Kanat",2001,"Napoli","Serie A","2020'ler"],
+
+    ["Harry Kane","İngiltere","Forvet",1993,"Bayern Münih","Bundesliga","2020'ler"],
+    ["Jamal Musiala","Almanya","Ofansif OS",2003,"Bayern Münih","Bundesliga","2020'ler"],
+    ["Joshua Kimmich","Almanya","Orta Saha",1995,"Bayern Münih","Bundesliga","2020'ler"],
+    ["Manuel Neuer","Almanya","Kaleci",1986,"Bayern Münih","Bundesliga","2010'lar"],
+    ["Alphonso Davies","Kanada","Sol Bek",2000,"Bayern Münih","Bundesliga","2020'ler"],
+    ["Florian Wirtz","Almanya","Ofansif OS",2003,"Bayer Leverkusen","Bundesliga","2020'ler"],
+    ["Serhou Guirassy","Gine","Forvet",1996,"Borussia Dortmund","Bundesliga","2020'ler"],
+    ["Xavi Simons","Hollanda","Ofansif OS",2003,"RB Leipzig","Bundesliga","2020'ler"],
+
+    ["Ousmane Dembélé","Fransa","Kanat",1997,"PSG","Ligue 1","2020'ler"],
+    ["Achraf Hakimi","Fas","Sağ Bek",1998,"PSG","Ligue 1","2020'ler"],
+    ["Vitinha","Portekiz","Orta Saha",2000,"PSG","Ligue 1","2020'ler"],
+    ["João Neves","Portekiz","Orta Saha",2004,"PSG","Ligue 1","2020'ler"],
+    ["Bradley Barcola","Fransa","Kanat",2002,"PSG","Ligue 1","2020'ler"],
+    ["Marquinhos","Brezilya","Stoper",1994,"PSG","Ligue 1","2020'ler"],
+    ["Gianluigi Donnarumma","İtalya","Kaleci",1999,"PSG","Ligue 1","2020'ler"],
+
+    ["Lionel Messi","Arjantin","Kanat",1987,"Barcelona","La Liga","2010'lar"],
+    ["Cristiano Ronaldo","Portekiz","Forvet",1985,"Real Madrid","La Liga","2010'lar"],
+    ["Zinedine Zidane","Fransa","Ofansif OS",1972,"Real Madrid","La Liga","2000'ler"],
+    ["Ronaldinho","Brezilya","Ofansif OS",1980,"Barcelona","La Liga","2000'ler"],
+    ["Ronaldo Nazário","Brezilya","Forvet",1976,"Real Madrid","La Liga","2000'ler"],
+    ["Raúl","İspanya","Forvet",1977,"Real Madrid","La Liga","2000'ler"],
+    ["Iker Casillas","İspanya","Kaleci",1981,"Real Madrid","La Liga","2000'ler"],
+    ["Sergio Ramos","İspanya","Stoper",1986,"Real Madrid","La Liga","2010'lar"],
+    ["Luka Modrić","Hırvatistan","Orta Saha",1985,"Real Madrid","La Liga","2010'lar"],
+    ["Toni Kroos","Almanya","Orta Saha",1990,"Real Madrid","La Liga","2010'lar"],
+    ["Karim Benzema","Fransa","Forvet",1987,"Real Madrid","La Liga","2010'lar"],
+    ["Gareth Bale","Galler","Kanat",1989,"Real Madrid","La Liga","2010'lar"],
+    ["Xavi","İspanya","Orta Saha",1980,"Barcelona","La Liga","2000'ler"],
+    ["Andrés Iniesta","İspanya","Orta Saha",1984,"Barcelona","La Liga","2010'lar"],
+    ["Carles Puyol","İspanya","Stoper",1978,"Barcelona","La Liga","2000'ler"],
+    ["Samuel Eto'o","Kamerun","Forvet",1981,"Barcelona","La Liga","2000'ler"],
+    ["Luis Suárez","Uruguay","Forvet",1987,"Barcelona","La Liga","2010'lar"],
+    ["Diego Godín","Uruguay","Stoper",1986,"Atlético Madrid","La Liga","2010'lar"],
+
+    ["Paolo Maldini","İtalya","Sol Bek",1968,"Milan","Serie A","1990'lar"],
+    ["Alessandro Del Piero","İtalya","Forvet",1974,"Juventus","Serie A","2000'ler"],
+    ["Francesco Totti","İtalya","Ofansif OS",1976,"Roma","Serie A","2000'ler"],
+    ["Andrea Pirlo","İtalya","Orta Saha",1979,"Milan","Serie A","2000'ler"],
+    ["Gianluigi Buffon","İtalya","Kaleci",1978,"Juventus","Serie A","2000'ler"],
+    ["Kaká","Brezilya","Ofansif OS",1982,"Milan","Serie A","2000'ler"],
+    ["Zlatan Ibrahimović","İsveç","Forvet",1981,"Milan","Serie A","2010'lar"],
+    ["Roberto Baggio","İtalya","Ofansif OS",1967,"Juventus","Serie A","1990'lar"],
+    ["Marco van Basten","Hollanda","Forvet",1964,"Milan","Serie A","1980'ler"],
+    ["Ruud Gullit","Hollanda","Ofansif OS",1962,"Milan","Serie A","1980'ler"],
+
+    ["Thierry Henry","Fransa","Forvet",1977,"Arsenal","Premier Lig","2000'ler"],
+    ["Dennis Bergkamp","Hollanda","Ofansif OS",1969,"Arsenal","Premier Lig","1990'lar"],
+    ["Patrick Vieira","Fransa","Orta Saha",1976,"Arsenal","Premier Lig","2000'ler"],
+    ["Cesc Fàbregas","İspanya","Orta Saha",1987,"Arsenal","Premier Lig","2000'ler"],
+    ["Steven Gerrard","İngiltere","Orta Saha",1980,"Liverpool","Premier Lig","2000'ler"],
+    ["Fernando Torres","İspanya","Forvet",1984,"Liverpool","Premier Lig","2000'ler"],
+    ["Frank Lampard","İngiltere","Orta Saha",1978,"Chelsea","Premier Lig","2000'ler"],
+    ["John Terry","İngiltere","Stoper",1980,"Chelsea","Premier Lig","2000'ler"],
+    ["Petr Čech","Çekya","Kaleci",1982,"Chelsea","Premier Lig","2000'ler"],
+    ["Didier Drogba","Fildişi Sahili","Forvet",1978,"Chelsea","Premier Lig","2000'ler"],
+    ["Ashley Cole","İngiltere","Sol Bek",1980,"Chelsea","Premier Lig","2000'ler"],
+    ["Michael Essien","Gana","Orta Saha",1982,"Chelsea","Premier Lig","2000'ler"],
+    ["Claude Makélélé","Fransa","Orta Saha",1973,"Chelsea","Premier Lig","2000'ler"],
+    ["Michael Ballack","Almanya","Orta Saha",1976,"Chelsea","Premier Lig","2000'ler"],
+    ["Eden Hazard","Belçika","Kanat",1991,"Chelsea","Premier Lig","2010'lar"],
+    ["Wayne Rooney","İngiltere","Forvet",1985,"Manchester United","Premier Lig","2000'ler"],
+    ["Ryan Giggs","Galler","Kanat",1973,"Manchester United","Premier Lig","1990'lar"],
+    ["Paul Scholes","İngiltere","Orta Saha",1974,"Manchester United","Premier Lig","2000'ler"],
+    ["David Beckham","İngiltere","Kanat",1975,"Manchester United","Premier Lig","1990'lar"],
+    ["Rio Ferdinand","İngiltere","Stoper",1978,"Manchester United","Premier Lig","2000'ler"],
+    ["Nemanja Vidić","Sırbistan","Stoper",1981,"Manchester United","Premier Lig","2000'ler"],
+    ["Ruud van Nistelrooy","Hollanda","Forvet",1976,"Manchester United","Premier Lig","2000'ler"],
+    ["Sergio Agüero","Arjantin","Forvet",1988,"Manchester City","Premier Lig","2010'lar"],
+    ["Vincent Kompany","Belçika","Stoper",1986,"Manchester City","Premier Lig","2010'lar"],
+    ["David Silva","İspanya","Ofansif OS",1986,"Manchester City","Premier Lig","2010'lar"],
+    ["Yaya Touré","Fildişi Sahili","Orta Saha",1983,"Manchester City","Premier Lig","2010'lar"],
+
+    ["Franck Ribéry","Fransa","Kanat",1983,"Bayern Münih","Bundesliga","2010'lar"],
+    ["Arjen Robben","Hollanda","Kanat",1984,"Bayern Münih","Bundesliga","2010'lar"],
+    ["Philipp Lahm","Almanya","Sağ Bek",1983,"Bayern Münih","Bundesliga","2010'lar"],
+    ["Bastian Schweinsteiger","Almanya","Orta Saha",1984,"Bayern Münih","Bundesliga","2010'lar"],
+    ["Oliver Kahn","Almanya","Kaleci",1969,"Bayern Münih","Bundesliga","2000'ler"],
+
+    ["Neymar","Brezilya","Kanat",1992,"PSG","Ligue 1","2010'lar"],
+    ["Edinson Cavani","Uruguay","Forvet",1987,"PSG","Ligue 1","2010'lar"]
+  ].map(function(r){ return { ad:r[0], ulke:r[1], mevki:r[2], dogum:r[3], takim:r[4], lig:r[5], donem:r[6] }; });
+
+  var YIL=new Date().getFullYear();
+  [P_SL, P_D].forEach(function(L){ L.forEach(function(p){ p.yas = YIL - p.dogum; }); });
+
+  var MODLAR = {
+    sl:    { ad:"Süper Lig arşivi", liste:P_SL, tohum:0 },
+    dunya: { ad:"Dünya arşivi",     liste:P_D,  tohum:7 }
+  };
+
+  var EPOCH=Date.UTC(2026,0,1);
+  var gunNo=Math.floor((Date.now()-EPOCH)/86400000);
+
+  var boardEl=document.getElementById("board"), inputEl=document.getElementById("guess"),
+      suggEl=document.getElementById("sugg"), hintEl=document.getElementById("hint"),
+      resultEl=document.getElementById("result"), guessZone=document.getElementById("guessZone");
+  var MAX=6;
+
+  // her mod kendi ilerlemesini korur
+  var DURUMLAR = { sl:{tahminler:[],bitti:false}, dunya:{tahminler:[],bitti:false} };
+  var mod="sl", P=P_SL, hedef=null, S=DURUMLAR.sl;
+
+  function donemIdx(d){ return DONEMLER.indexOf(d); }
 
   function durum(p) {
-    var fark = Math.abs(p.yas - hedef.yas);
+    var fy=Math.abs(p.yas-hedef.yas);
+    var di=donemIdx(p.donem), hi=donemIdx(hedef.donem);
+    var dFark=(di<0||hi<0)?99:Math.abs(di-hi);
+    var takimDurum;
+    if (p.takim===hedef.takim) takimDurum="hit";
+    else if (mod==="dunya") takimDurum = (p.lig===hedef.lig) ? "near" : "miss";
+    else takimDurum = (SEHIR[p.takim] && SEHIR[p.takim]===SEHIR[hedef.takim]) ? "near" : "miss";
     return {
-      takim: p.takim === hedef.takim ? "hit" : (SEHIR[p.takim] && SEHIR[p.takim] === SEHIR[hedef.takim] ? "near" : "miss"),
-      ulke:  p.ulke  === hedef.ulke  ? "hit" : (KITA[p.ulke] === KITA[hedef.ulke] ? "near" : "miss"),
-      mevki: p.mevki === hedef.mevki ? "hit" : (HAT[p.mevki] === HAT[hedef.mevki] ? "near" : "miss"),
-      yas:   fark === 0 ? "hit" : (fark <= 3 ? "near" : "miss")
+      takim: takimDurum,
+      ulke:  p.ulke===hedef.ulke ? "hit" : "miss",
+      kita:  KITA[p.ulke]===KITA[hedef.ulke] ? "hit" : "miss",
+      mevki: p.mevki===hedef.mevki ? "hit" : (HAT[p.mevki]===HAT[hedef.mevki] ? "near":"miss"),
+      donem: p.donem===hedef.donem ? "hit" : (dFark===1 ? "near":"miss"),
+      yas:   fy===0 ? "hit" : (fy<=3 ? "near":"miss")
     };
   }
 
-  function satirCiz(p) {
-    var d = durum(p);
-    var ok = p.yas === hedef.yas ? "" : (p.yas > hedef.yas ? " ↓" : " ↑");
-    var row = document.createElement("div");
-    row.className = "row";
-    [["Takım",p.takim,d.takim],["Ülke",p.ulke,d.ulke],["Mevki",p.mevki,d.mevki],["Yaş",p.yas+ok,d.yas]]
-      .forEach(function (c, i) {
-        var cell = document.createElement("div");
-        cell.className = "cell " + c[2] + " flip";
-        cell.style.animationDelay = (i * 90) + "ms";
-        cell.innerHTML = '<span class="lbl">' + c[0] + '</span><span class="val">' + c[1] + '</span>';
+  function satirCiz(p, sessiz) {
+    var d=durum(p);
+    var okY = p.yas===hedef.yas ? "" : (p.yas>hedef.yas ? " ↓" : " ↑");
+    var di=donemIdx(p.donem), hi=donemIdx(hedef.donem);
+    var okD = (di<0||hi<0||di===hi) ? "" : (di>hi ? " ↓" : " ↑");
+    var row=document.createElement("div");
+    row.className="row";
+    [["Takım",p.takim,d.takim],["Ülke",p.ulke,d.ulke],["Kıta",KITA[p.ulke]||"—",d.kita],
+     ["Mevki",p.mevki,d.mevki],["Dönem",p.donem+okD,d.donem],["Yaş",p.yas+okY,d.yas]]
+      .forEach(function(c,i){
+        var cell=document.createElement("div");
+        cell.className="cell "+c[2]+(sessiz?"":" flip");
+        if(!sessiz) cell.style.animationDelay=(i*70)+"ms";
+        cell.innerHTML='<span class="lbl">'+c[0]+'</span><span class="val">'+c[1]+'</span>';
         row.appendChild(cell);
       });
     boardEl.appendChild(row);
   }
 
-  var EMOJI = { hit:"🟩", near:"🟨", miss:"⬜" };
+  var EMOJI={hit:"🟩",near:"🟨",miss:"⬜"};
 
   function paylasimMetni() {
-    var satirlar = tahminler.map(function (p) {
-      var d = durum(p);
-      return EMOJI[d.takim] + EMOJI[d.ulke] + EMOJI[d.mevki] + EMOJI[d.yas];
+    var satirlar=S.tahminler.map(function(p){
+      var d=durum(p);
+      return EMOJI[d.takim]+EMOJI[d.ulke]+EMOJI[d.kita]+EMOJI[d.mevki]+EMOJI[d.donem]+EMOJI[d.yas];
     });
-    var skor = tahminler.length && tahminler[tahminler.length - 1].ad === hedef.ad
-      ? tahminler.length + "/" + MAX : "X/" + MAX;
-    return "DOKSAN · Bilmece #" + (gunNo + 1) + "  " + skor + "\n\n" + satirlar.join("\n");
+    var skor = S.tahminler.length && S.tahminler[S.tahminler.length-1].ad===hedef.ad
+      ? S.tahminler.length+"/"+MAX : "X/"+MAX;
+    var etiket = mod==="sl" ? "Süper Lig" : "Dünya";
+    return "DALABALL · "+etiket+" #"+(gunNo+1)+"  "+skor+"\n\n"+satirlar.join("\n");
   }
 
   function geriSayim() {
-    var el = document.getElementById("cd");
-    function tik() {
-      var now = new Date(), yarin = new Date(now);
-      yarin.setHours(24, 0, 0, 0);
-      var s = Math.floor((yarin - now) / 1000);
-      el.textContent = String(Math.floor(s / 3600)).padStart(2, "0") + ":" +
-                       String(Math.floor(s % 3600 / 60)).padStart(2, "0") + ":" +
-                       String(s % 60).padStart(2, "0");
+    var el=document.getElementById("cd");
+    function tik(){
+      var now=new Date(), yarin=new Date(now);
+      yarin.setHours(24,0,0,0);
+      var s=Math.floor((yarin-now)/1000);
+      el.textContent=String(Math.floor(s/3600)).padStart(2,"0")+":"+
+                     String(Math.floor(s%3600/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0");
     }
-    tik(); setInterval(tik, 1000);
+    tik(); setInterval(tik,1000);
   }
 
+  var geriSayimBasladi=false;
+
   function bitir(kazandi) {
-    bitti = true;
-    document.getElementById("guessZone").hidden = true;
+    S.bitti=true;
+    guessZone.hidden=true;
+    hintEl.hidden=true;
     document.getElementById("resTitle").textContent = kazandi
-      ? (tahminler.length === 1 ? "İlk tahminde! İnanılmaz." : tahminler.length + " tahminde bildin.")
+      ? (S.tahminler.length===1 ? "İlk tahminde! İnanılmaz." : S.tahminler.length+" tahminde bildin.")
       : "Bugünlük bu kadar.";
     document.getElementById("resAnswer").textContent =
-      "Cevap: " + hedef.ad + " — " + hedef.takim + ", " + hedef.ulke + ", " + hedef.mevki + ", " + hedef.yas;
-    document.getElementById("shareText").textContent = paylasimMetni();
-    document.getElementById("result").hidden = false;
-    geriSayim();
+      "Cevap: "+hedef.ad+" — "+hedef.takim+", "+hedef.ulke+", "+hedef.mevki+", "+hedef.donem+", "+hedef.yas+" yaşında";
+    document.getElementById("shareText").textContent=paylasimMetni();
+    resultEl.hidden=false;
+    if(!geriSayimBasladi){ geriSayimBasladi=true; geriSayim(); }
   }
 
   function tahminEt(p) {
-    if (bitti) return;
-    tahminler.push(p);
+    if(S.bitti) return;
+    S.tahminler.push(p);
     satirCiz(p);
-    inputEl.value = "";
-    suggEl.hidden = true;
-    if (p.ad === hedef.ad) bitir(true);
-    else if (tahminler.length >= MAX) bitir(false);
+    inputEl.value=""; suggEl.hidden=true;
+    hintEl.textContent="Havuzda "+P.length+" futbolcu · kalan hak: "+(MAX-S.tahminler.length);
+    if(p.ad===hedef.ad) bitir(true);
+    else if(S.tahminler.length>=MAX) bitir(false);
   }
+
+  function modKur(yeni) {
+    mod=yeni;
+    var M=MODLAR[mod];
+    P=M.liste;
+    S=DURUMLAR[mod];
+    hedef=P[(((gunNo+M.tohum) % P.length)+P.length) % P.length];
+
+    document.getElementById("poolInfo").textContent = M.ad+" · "+P.length+" futbolcu";
+    document.getElementById("puzNo").textContent = "#"+(gunNo+1);
+
+    // tahtayı bu modun ilerlemesiyle yeniden çiz
+    boardEl.querySelectorAll(".row:not(.hdr-row)").forEach(function(r){ r.remove(); });
+    S.tahminler.forEach(function(p){ satirCiz(p, true); });
+
+    if (S.bitti) {
+      guessZone.hidden=true; hintEl.hidden=true;
+      bitir(S.tahminler.length && S.tahminler[S.tahminler.length-1].ad===hedef.ad);
+    } else {
+      guessZone.hidden=false; hintEl.hidden=false; resultEl.hidden=true;
+      inputEl.value=""; suggEl.hidden=true;
+      hintEl.textContent="Havuzda "+P.length+" futbolcu · kalan hak: "+(MAX-S.tahminler.length);
+    }
+  }
+
+  document.querySelectorAll("#modes button").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.querySelectorAll("#modes button").forEach(function(x){
+        x.setAttribute("aria-pressed", x===b ? "true":"false");
+      });
+      modKur(b.dataset.mode);
+    });
+  });
 
   function normalize(s) {
-    return s.toLocaleLowerCase("tr").replace(/ı/g,"i").replace(/ğ/g,"g")
-            .replace(/ü/g,"u").replace(/ş/g,"s").replace(/ö/g,"o").replace(/ç/g,"c");
+    return s.toLocaleLowerCase("tr").replace(/ı/g,"i").replace(/ğ/g,"g").replace(/ü/g,"u")
+            .replace(/ş/g,"s").replace(/ö/g,"o").replace(/ç/g,"c")
+            .normalize("NFD").replace(/[̀-ͯ]/g,"");
   }
 
-  inputEl.addEventListener("input", function () {
-    var q = normalize(inputEl.value.trim());
-    if (!q) { suggEl.hidden = true; return; }
-    var kullanilan = tahminler.map(function (t) { return t.ad; });
-    var hits = P.filter(function (p) {
-      return normalize(p.ad).indexOf(q) !== -1 && kullanilan.indexOf(p.ad) === -1;
-    }).slice(0, 7);
-    if (!hits.length) { suggEl.hidden = true; return; }
-    suggEl.innerHTML = "";
-    hits.forEach(function (p) {
-      var b = document.createElement("button");
-      b.type = "button";
-      b.textContent = p.ad;
-      b.addEventListener("click", function () { tahminEt(p); });
+  inputEl.addEventListener("input", function(){
+    var q=normalize(inputEl.value.trim());
+    if(!q){ suggEl.hidden=true; return; }
+    var kullanilan=S.tahminler.map(function(t){return t.ad;});
+    var hits=P.filter(function(p){
+      return normalize(p.ad).indexOf(q)!==-1 && kullanilan.indexOf(p.ad)===-1;
+    }).slice(0,8);
+    if(!hits.length){ suggEl.hidden=true; return; }
+    suggEl.innerHTML="";
+    hits.forEach(function(p){
+      var b=document.createElement("button");
+      b.type="button";
+      var nm=document.createElement("span"); nm.textContent=p.ad;
+      var mt=document.createElement("span"); mt.className="meta";
+      mt.textContent = p.takim+" · "+(p.lig ? p.lig+" · " : "")+p.donem;
+      b.appendChild(nm); b.appendChild(mt);
+      b.addEventListener("click", function(){ tahminEt(p); });
       suggEl.appendChild(b);
     });
-    suggEl.hidden = false;
+    suggEl.hidden=false;
   });
 
-  inputEl.addEventListener("keydown", function (e) {
-    if (e.key === "Enter") {
-      var first = suggEl.querySelector("button");
-      if (first && !suggEl.hidden) first.click();
-    }
-    if (e.key === "Escape") suggEl.hidden = true;
+  inputEl.addEventListener("keydown", function(e){
+    if(e.key==="Enter"){ var f=suggEl.querySelector("button"); if(f && !suggEl.hidden) f.click(); }
+    if(e.key==="Escape") suggEl.hidden=true;
   });
 
-  document.getElementById("copyBtn").addEventListener("click", function () {
-    var btn = this;
-    var t = document.getElementById("shareText").textContent;
-    if (navigator.share) {
-      navigator.share({ text: t }).catch(function () {});
-      return;
-    }
-    navigator.clipboard.writeText(t).then(function () {
-      btn.textContent = "Kopyalandı";
-      setTimeout(function () { btn.textContent = "Sonucu kopyala"; }, 1800);
+  document.getElementById("copyBtn").addEventListener("click", function(){
+    var btn=this, t=document.getElementById("shareText").textContent;
+    if(navigator.share){ navigator.share({text:t}).catch(function(){}); return; }
+    navigator.clipboard.writeText(t).then(function(){
+      btn.textContent="Kopyalandı";
+      setTimeout(function(){ btn.textContent="Sonucu paylaş"; },1800);
     });
   });
+
+  modKur("sl");
 
 })();
 </script>
