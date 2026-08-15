@@ -191,6 +191,15 @@
   .kredi[hidden] { display:none; }
 
   /* --- ipucu --- */
+  .modAciklama {
+    font-family:var(--mono); font-size:11px; line-height:1.5; color:var(--muted);
+    margin:9px 0 0; letter-spacing:.02em;
+  }
+  .modAciklama b { color:var(--ink-2); font-weight:600; }
+  .ghost.tehlike { border-style:dashed; }
+  .ghost.tehlike:hover { border-color:var(--near); color:var(--near); }
+  .ghost[hidden] { display:none; }
+
   .ipucu {
     margin:12px 0 0; padding:11px 14px; font-size:13px; color:var(--near);
     background:rgba(201,150,43,.10); border:1px solid rgba(201,150,43,.3); border-radius:3px;
@@ -314,6 +323,7 @@
       <button type="button" aria-pressed="true"  data-mode="sl">Süper Lig</button>
       <button type="button" aria-pressed="false" data-mode="dunya">Dünya</button>
     </div>
+    <p class="modAciklama" id="modAciklama"></p>
 
     <div class="fotoKutu" id="fotoKutu" hidden>
       <div class="fotoSar"><img id="foto" alt="Gizemli futbolcu" referrerpolicy="no-referrer"></div>
@@ -342,6 +352,7 @@
     <div class="soru-araclari">
       <button type="button" class="ghost" id="yeniSoru">Yeni soru</button>
       <button type="button" class="ghost" id="gunlukSoru" hidden>Günün sorusuna dön</button>
+      <button type="button" class="ghost tehlike" id="cevabiGoster">Cevabı göster</button>
     </div>
 
     <div class="zorluk">
@@ -8260,8 +8271,8 @@
 
   // her mod kendi ilerlemesini korur
   var DURUMLAR = {
-    sl:    { tahminler:[], bitti:false, hedef:null, rastgele:false },
-    dunya: { tahminler:[], bitti:false, hedef:null, rastgele:false }
+    sl:    { tahminler:[], bitti:false, hedef:null, rastgele:false, acildi:false },
+    dunya: { tahminler:[], bitti:false, hedef:null, rastgele:false, acildi:false }
   };
   var mod="sl", P=P_SL, hedef=null, S=DURUMLAR.sl;
 
@@ -8375,7 +8386,7 @@
   function bosIstat(){ return {oynanan:0, bilinen:0, seri:0, enIyi:0, sonGun:null, dagilim:[0,0,0,0,0,0]}; }
 
   function istatKaydet(kazandi, tahminSayisi) {
-    if(S.rastgele) return null;                 // rastgele sorular sayilmaz
+    if(S.rastgele || S.acildi) return null;     // rastgele ve acilan cevaplar sayilmaz
     var hepsi=istatOku(), st=hepsi[mod]||bosIstat();
     if(st.sonGun===gunNo) return st;            // bugun zaten kaydedildi
     st.oynanan++;
@@ -8417,9 +8428,11 @@
     S.bitti=true;
     guessZone.hidden=true;
     hintEl.hidden=true;
-    document.getElementById("resTitle").textContent = kazandi
-      ? (S.tahminler.length===1 ? "İlk tahminde! İnanılmaz." : S.tahminler.length+" tahminde bildin.")
-      : "Bugünlük bu kadar.";
+    document.getElementById("resTitle").textContent = S.acildi
+      ? "Cevap açıldı."
+      : (kazandi
+          ? (S.tahminler.length===1 ? "İlk tahminde! İnanılmaz." : S.tahminler.length+" tahminde bildin.")
+          : "Bugünlük bu kadar.");
     var yillar = OLUM[hedef.ad]
       ? hedef.dogum+"–"+OLUM[hedef.ad]
       : hedef.yas+" yaşında";
@@ -8456,6 +8469,9 @@
     hedef=S.hedef;
 
     document.getElementById("poolInfo").textContent = M.ad+" · "+P.length+" futbolcu";
+    document.getElementById("modAciklama").innerHTML = mod==="sl"
+      ? "Türkiye'de bir kulüpte oynamış <b>herkes</b> — Türk de yabancı da, her dönemden. Kulüp sütununda oynadığı <b>Türk kulübü</b> yazar."
+      : "Avrupa'nın <b>5 büyük liginde</b> oynamış herkes. Aynı futbolcu iki modda da çıkabilir; kulüp sütunu moda göre değişir.";
     document.getElementById("puzNo").textContent = S.rastgele ? "RASTGELE" : "#"+(gunNo+1);
     document.getElementById("gunlukSoru").hidden = !S.rastgele;
 
@@ -8491,7 +8507,7 @@
 
   function tahtayiSifirla() {
     boardEl.querySelectorAll(".row:not(.hdr-row)").forEach(function(r){ r.remove(); });
-    S.tahminler=[]; S.bitti=false;
+    S.tahminler=[]; S.bitti=false; S.acildi=false;
     guessZone.hidden=false; hintEl.hidden=false; resultEl.hidden=true;
     ipucuEl.hidden=true;
     fotoYukle(hedef.ad);
@@ -8516,6 +8532,12 @@
     hedef=S.hedef;
     tahtayiSifirla();
     inputEl.focus();
+  });
+
+  document.getElementById("cevabiGoster").addEventListener("click", function(){
+    if(S.bitti) return;
+    S.acildi=true;
+    bitir(false);
   });
 
   document.getElementById("gunlukSoru").addEventListener("click", function(){
