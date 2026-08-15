@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0B1210">
+
+<!-- Güvenlik: sayfa hiçbir dış kaynağa bağlanamaz, hiçbir yere veri gönderemez.
+     Tüm stil/kod dosyanın içinde; dışarıdan script yüklenmesi tarayıcı seviyesinde engelli. -->
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
 <meta name="description" content="Süper Lig teknik direktör ve başkanlarının görev süresi canlı sayaç. Bahissiz, reklamsız.">
 <title>DOKSAN — Koltuk Sayacı & Günlük Futbol Bilmecesi</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚽</text></svg>">
@@ -323,6 +329,7 @@
   <footer>
     <p><strong>Görseller temsilîdir.</strong> Kişilerin fotoğrafı kullanılmıyor; ajans telifli oldukları için. Her kart, gerçek portre olmayan <em>genel bir çizim</em> ve kişinin kulübünün <em>renklerinden</em> oluşan zemin taşır. Kulüp renkleri korunmuyor, armaları korunuyor — o yüzden arma yok.</p>
     <p>Bu site hiçbir kulüp, TFF veya lig organizasyonu ile bağlantılı değildir. Bahis içeriği, oran ve yönlendirme <strong>hiçbir koşulda</strong> yer almaz.</p>
+    <p><strong>Veri toplamıyoruz.</strong> Çerez yok, takip yok, analiz yok, üyelik yok. Sayfa hiçbir dış sunucuya bağlanmaz — açtığın anda her şey cihazında çalışır ve hiçbir yere bilgi gitmez.</p>
   </footer>
 
 </div>
