@@ -169,20 +169,57 @@
   .sugg button:hover, .sugg button:focus-visible { background:var(--flood); color:#171104; outline:none; }
   .sugg button:hover .meta, .sugg button:focus-visible .meta { color:rgba(23,17,4,.7); }
 
-  .rev { display:flex; gap:14px; align-items:flex-start; margin-bottom:14px; flex-wrap:wrap; }
-  .fotoKutu { width:104px; flex-shrink:0; }
+  /* --- gizemli fotograf --- */
+  .fotoKutu { display:flex; flex-direction:column; align-items:center; margin:14px 0 4px; }
   .fotoKutu[hidden] { display:none; }
-  .fotoKutu img {
-    width:104px; height:132px; object-fit:cover; object-position:top center;
-    border-radius:3px; border:1px solid var(--line); background:var(--ground-2); display:block;
+  .fotoSar {
+    width:150px; height:186px; overflow:hidden; border-radius:4px;
+    border:1px solid var(--line); background:var(--ground-2); position:relative;
   }
+  .fotoSar img {
+    width:100%; height:100%; object-fit:cover; object-position:top center; display:block;
+    transform:scale(1.12);
+    filter:blur(var(--bl,20px)) saturate(.85);
+    transition:filter .55s ease, transform .55s ease;
+  }
+  .fotoKutu.acik .fotoSar img { transform:scale(1); filter:none; }
   .kredi {
     display:block; font-family:var(--mono); font-size:8.5px; letter-spacing:.04em;
-    color:var(--muted); margin-top:5px; text-decoration:none; line-height:1.3;
+    color:var(--muted); margin-top:6px; text-decoration:none; text-align:center;
   }
   .kredi:hover { color:var(--flood); text-decoration:underline; }
-  .revMetin { flex:1; min-width:170px; }
-  .revMetin h3 { margin-top:0; }
+  .kredi[hidden] { display:none; }
+
+  /* --- ipucu --- */
+  .ipucu {
+    margin:12px 0 0; padding:11px 14px; font-size:13px; color:var(--near);
+    background:rgba(201,150,43,.10); border:1px solid rgba(201,150,43,.3); border-radius:3px;
+  }
+  .ipucu[hidden] { display:none; }
+  .ipucu b { color:var(--ink); font-family:var(--mono); letter-spacing:.08em; }
+
+  /* --- zorluk --- */
+  .zorluk { margin-top:16px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .zLbl { font-family:var(--mono); font-size:9.5px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+  .zBtn { display:flex; gap:3px; background:var(--ground-2); border:1px solid var(--line-soft); border-radius:999px; padding:3px; }
+  .zBtn button {
+    appearance:none; background:transparent; border:0; color:var(--muted);
+    font-family:var(--sans); font-size:12.5px; font-weight:600;
+    padding:7px 13px; border-radius:999px; cursor:pointer;
+  }
+  .zBtn button[aria-pressed="true"] { background:var(--flood); color:#171104; }
+  .zBtn button:focus-visible { outline:2px solid var(--flood); outline-offset:2px; }
+
+  /* --- istatistik --- */
+  .istat { margin:16px 0 14px; padding-top:14px; border-top:1px solid var(--line-soft); }
+  .istat .satir { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-bottom:14px; }
+  .istat .kutu { text-align:center; }
+  .istat .kutu .s { font-family:var(--mono); font-size:22px; font-weight:700; color:var(--flood); font-variant-numeric:tabular-nums; display:block; line-height:1.15; }
+  .istat .kutu .e { font-family:var(--mono); font-size:8.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
+  .istat .bd { display:grid; gap:3px; }
+  .istat .bd .sr { display:grid; grid-template-columns:14px 1fr; gap:7px; align-items:center; font-family:var(--mono); font-size:11px; color:var(--muted); }
+  .istat .bd .cb { background:var(--miss); border-radius:2px; padding:2px 7px; color:var(--ink-2); text-align:right; min-width:26px; font-size:10.5px; }
+  .istat .bd .cb.bugun { background:var(--hit); color:#04150B; font-weight:700; }
 
   .soru-araclari { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
   .ghost {
@@ -278,6 +315,11 @@
       <button type="button" aria-pressed="false" data-mode="dunya">Dünya</button>
     </div>
 
+    <div class="fotoKutu" id="fotoKutu" hidden>
+      <div class="fotoSar"><img id="foto" alt="Gizemli futbolcu" referrerpolicy="no-referrer"></div>
+      <a class="kredi" id="fotoKredi" target="_blank" rel="noopener noreferrer" hidden>Fotoğraf: Wikimedia Commons</a>
+    </div>
+
     <div class="board" id="board">
       <div class="row hdr-row">
         <div class="cell"><span class="lbl">Takım</span></div>
@@ -295,22 +337,26 @@
     </div>
     <p class="hint" id="hint"></p>
 
+    <p class="ipucu" id="ipucu" hidden></p>
+
     <div class="soru-araclari">
       <button type="button" class="ghost" id="yeniSoru">Yeni soru</button>
       <button type="button" class="ghost" id="gunlukSoru" hidden>Günün sorusuna dön</button>
     </div>
 
-    <div class="result" id="result" hidden>
-      <div class="rev">
-        <div class="fotoKutu" id="fotoKutu" hidden>
-          <img id="foto" alt="" referrerpolicy="no-referrer" loading="lazy">
-          <a class="kredi" id="fotoKredi" target="_blank" rel="noopener noreferrer">Fotoğraf: Wikimedia Commons</a>
-        </div>
-        <div class="revMetin">
-          <h3 id="resTitle"></h3>
-          <p class="answer" id="resAnswer"></p>
-        </div>
+    <div class="zorluk">
+      <span class="zLbl">Rastgele soru zorluğu</span>
+      <div class="zBtn">
+        <button type="button" data-z="kolay">Efsaneler</button>
+        <button type="button" data-z="normal" aria-pressed="true">Normal</button>
+        <button type="button" data-z="zor">Uzman</button>
       </div>
+    </div>
+
+    <div class="result" id="result" hidden>
+      <h3 id="resTitle"></h3>
+      <p class="answer" id="resAnswer"></p>
+      <div class="istat" id="istat"></div>
       <pre class="share" id="shareText"></pre>
       <button class="btn" id="copyBtn">Sonucu paylaş</button>
       <div class="countdown">Yeni bilmeceye kalan süre: <b id="cd">--:--:--</b></div>
@@ -334,6 +380,143 @@
     "Kocaelispor":["#00693E","#111111"], "Eyüpspor":["#5B2A86","#FBB800"],
     "Gençlerbirliği":["#C8102E","#111111"], "Çorum FK":["#C8102E","#F5F5F5"],
     "Erzurumspor FK":["#1B458F","#F5F5F5"], "Amedspor":["#C8102E","#00693E"]
+  };
+
+  var OLUM = {
+"Aaron Boupendza":2025,
+"Abdelaziz Barrada":2024,
+"Agne Simonsson":2020,
+"Ahmet Çalık":2022,
+"Alan Ball":2007,
+"Alejandro Sabella":2020,
+"Alfred Pfaff":2008,
+"Alfredo Di Stéfano":2014,
+"Amancio Amaro":2023,
+"Andrejs Rubins":2022,
+"André Silva":2025,
+"Anele Ngcongca":2020,
+"Bernard Lacombe":2025,
+"Bernd Hölzenbein":2024,
+"Bill Foulkes":2013,
+"Billy Bremner":1997,
+"Bobby Charlton":2023,
+"Bobby Moore":1993,
+"Bobby Robson":2009,
+"Brian Clough":2004,
+"Bruno Pezzey":1994,
+"Burhan Sargun":2023,
+"Cheick Tioté":2017,
+"Christian Atsu":2023,
+"Cléber Santana":2016,
+"Colin Bell":2021,
+"Dalian Atkinson":2016,
+"Denis Law":2025,
+"Dennis Viollet":1999,
+"Diego Maradona":2020,
+"Dieter Herzog":2025,
+"Diogo Jota":2025,
+"Dirceu":1995,
+"Don Revie":1989,
+"Dragoslav Šekularac":2019,
+"Duncan Edwards":1958,
+"Emerich Jenei":2025,
+"Enrique Collar":2025,
+"Fadil Vokrri":2018,
+"Ferenc Puskás":2006,
+"Francisco Gento":2022,
+"Franco Baresi":2026,
+"Frank Mill":2025,
+"Franz Beckenbauer":2024,
+"Freddy Rincón":2022,
+"Gaetano Scirea":1989,
+"Gerd Müller":2021,
+"Giacinto Facchetti":2006,
+"Gianluca Vialli":2023,
+"Giorgio Chinaglia":2012,
+"Goyo Benito":2020,
+"Hannes Löhr":2016,
+"Hans Schäfer":2017,
+"Hans Tilkowski":2020,
+"Harry Gregg":2020,
+"Heinz Flohe":2013,
+"Helmut Rahn":2003,
+"Hugo Maradona":2021,
+"Héctor Rial":1991,
+"Ignacio Zoco":2015,
+"Isaac Promise":2019,
+"Ivica Osim":2022,
+"Jack Charlton":2020,
+"Janusz Kupcewicz":2022,
+"Jesús María Pereda":2011,
+"Jimmy Greaves":2021,
+"Joaquín Peiró":2020,
+"Joey Jones":2025,
+"Johan Cruyff":2016,
+"John Charles":2004,
+"John Robertson":2025,
+"Johnny Haynes":2005,
+"Josep Maria Fusté":2023,
+"José Luis Brown":2019,
+"José Manuel Ochotorena":2025,
+"Juan Alberto Schiaffino":2002,
+"Juanito":1992,
+"Junior Agogo":2019,
+"Just Fontaine":2023,
+"Justin Fashanu":1998,
+"Jürgen Grabowski":2022,
+"Karl Mai":1993,
+"Kazimierz Deyna":1989,
+"Kevin Campbell":2024,
+"Landry N'Guemo":2024,
+"Lorenzo Buffon":2025,
+"Lothar Emmerich":2003,
+"Luis Aragonés":2014,
+"Luis Suárez Miramontes":2023,
+"Luis del Sol":2021,
+"Luton Shelton":2021,
+"László Kubala":2002,
+"Marc-Vivien Foé":2003,
+"Martin Peters":2019,
+"Metin Oktay":1991,
+"Michael Eneramo":2026,
+"Miodrag Ješić":2022,
+"Moacir Rodrigues Santos":2024,
+"Nobby Stiles":2020,
+"Omar Sívori":2005,
+"Paolo Rossi":2020,
+"Papa Bouba Diop":2020,
+"Paul Mariner":2021,
+"Pelé":2022,
+"Piermario Morosini":2012,
+"Pietro Anastasi":2020,
+"Ray Clemence":2020,
+"Ray Kennedy":2021,
+"Ray Wilkins":2018,
+"Ray Wilson (futbolcu)":2018,
+"Raymond Kopa":2017,
+"Razak Omotoyossi":2025,
+"Robert Enke":2009,
+"Roger Byrne":1958,
+"Roger Hunt":2021,
+"Salvatore Schillaci":2024,
+"Siniša Mihajlović":2022,
+"Sol Bamba":2024,
+"Sándor Kocsis":1979,
+"Sócrates":2011,
+"Terry Venables":2023,
+"Thompson Oliha":2013,
+"Tito Vilanova":2014,
+"Tommy Smith":2019,
+"Tommy Taylor":1958,
+"Tony Dunne":2020,
+"Trevor Francis":2023,
+"Trifon Ivanov":2016,
+"Turgay Şeren":2016,
+"Udo Lattek":2015,
+"Valdir Pereira":2001,
+"Vavá":2002,
+"Włodzimierz Smolarek":2012,
+"Xabier Azkargorta":2025
   };
 
   var FOTO = {
@@ -8052,9 +8235,11 @@
     return a;
   }
 
-  // rastgele soru: 4'te 3 ihtimalle tanınmış katmandan
+  var zorluk="normal";   // kolay | normal | zor  — sadece rastgele soruyu etkiler
   function rastgeleHedef(M) {
     var n=M.liste.length, a=Math.min(M.unlu,n), b=n-a;
+    if(zorluk==="kolay") return M.liste[Math.floor(Math.random()*Math.min(100,a))];
+    if(zorluk==="zor")   return M.liste[Math.floor(Math.random()*n)];
     if(b>0 && Math.random()<0.25) return M.liste[a + Math.floor(Math.random()*b)];
     return M.liste[Math.floor(Math.random()*a)];
   }
@@ -8152,15 +8337,79 @@
 
   fotoImg.addEventListener("error", function(){ fotoKutu.hidden=true; });
 
-  function fotoGoster(ad) {
+  var BULANIK=[20,15,11,8,5,3,2];  // tahmin sayisina gore bulaniklik
+
+  function fotoYukle(ad) {
     var dosya = FOTO[ad];
+    fotoKutu.classList.remove("acik");
+    fotoKredi.hidden = true;
     if(!dosya){ fotoKutu.hidden=true; return; }
     var enc = encodeURIComponent(dosya.replace(/ /g,"_"));
-    fotoImg.src   = "https://commons.wikimedia.org/wiki/Special:FilePath/"+enc+"?width=300";
-    fotoImg.alt   = ad;
-    fotoKredi.href= "https://commons.wikimedia.org/wiki/File:"+enc;
+    fotoImg.src    = "https://commons.wikimedia.org/wiki/Special:FilePath/"+enc+"?width=340";
+    fotoImg.alt    = "Gizemli futbolcu";
+    fotoKredi.href = "https://commons.wikimedia.org/wiki/File:"+enc;
     fotoKutu.hidden=false;
+    fotoNetle();
   }
+
+  function fotoNetle() {
+    if(fotoKutu.hidden) return;
+    var n = Math.min(S.tahminler.length, BULANIK.length-1);
+    fotoKutu.style.setProperty("--bl", BULANIK[n]+"px");
+  }
+
+  function fotoAc(ad) {
+    if(fotoKutu.hidden) return;
+    fotoKutu.classList.add("acik");
+    fotoImg.alt = ad;
+    fotoKredi.hidden = false;
+  }
+
+  /* ---- istatistik: sadece gunluk sorular sayilir ---- */
+  var ANAHTAR="dalaball.istat.v1";
+  function istatOku() {
+    try { return JSON.parse(localStorage.getItem(ANAHTAR)) || {}; }
+    catch(e){ return {}; }
+  }
+  function istatYaz(o) { try { localStorage.setItem(ANAHTAR, JSON.stringify(o)); } catch(e){} }
+  function bosIstat(){ return {oynanan:0, bilinen:0, seri:0, enIyi:0, sonGun:null, dagilim:[0,0,0,0,0,0]}; }
+
+  function istatKaydet(kazandi, tahminSayisi) {
+    if(S.rastgele) return null;                 // rastgele sorular sayilmaz
+    var hepsi=istatOku(), st=hepsi[mod]||bosIstat();
+    if(st.sonGun===gunNo) return st;            // bugun zaten kaydedildi
+    st.oynanan++;
+    if(kazandi){
+      st.bilinen++;
+      st.dagilim[tahminSayisi-1]=(st.dagilim[tahminSayisi-1]||0)+1;
+      st.seri = (st.sonGun===gunNo-1) ? st.seri+1 : 1;
+      if(st.seri>st.enIyi) st.enIyi=st.seri;
+    } else {
+      st.seri=0;
+    }
+    st.sonGun=gunNo;
+    hepsi[mod]=st; istatYaz(hepsi);
+    return st;
+  }
+
+  function istatCiz(st, bugunTahmin) {
+    var el=document.getElementById("istat");
+    if(!st || !st.oynanan){ el.innerHTML=""; return; }
+    var oran=Math.round(st.bilinen/st.oynanan*100);
+    var enCok=Math.max.apply(null, st.dagilim.concat([1]));
+    var bar=st.dagilim.map(function(v,i){
+      var yuzde=Math.max(6, Math.round(v/enCok*100));
+      var bugun=(bugunTahmin===i+1)?" bugun":"";
+      return '<div class="sr"><span>'+(i+1)+'</span>'+
+             '<span class="cb'+bugun+'" style="width:'+yuzde+'%">'+v+'</span></div>';
+    }).join("");
+    el.innerHTML =
+      '<div class="satir">'+
+        kutuc(st.oynanan,"oynanan")+kutuc("%"+oran,"başarı")+
+        kutuc(st.seri,"seri")+kutuc(st.enIyi,"en iyi seri")+
+      '</div><div class="bd">'+bar+'</div>';
+  }
+  function kutuc(s,e){ return '<div class="kutu"><span class="s">'+s+'</span><span class="e">'+e+'</span></div>'; }
 
   var geriSayimBasladi=false;
 
@@ -8171,10 +8420,16 @@
     document.getElementById("resTitle").textContent = kazandi
       ? (S.tahminler.length===1 ? "İlk tahminde! İnanılmaz." : S.tahminler.length+" tahminde bildin.")
       : "Bugünlük bu kadar.";
+    var yillar = OLUM[hedef.ad]
+      ? hedef.dogum+"–"+OLUM[hedef.ad]
+      : hedef.yas+" yaşında";
     document.getElementById("resAnswer").textContent =
-      "Cevap: "+hedef.ad+" — "+hedef.takim+", "+hedef.ulke+", "+hedef.mevki+", "+hedef.donem+", "+hedef.yas+" yaşında";
+      "Cevap: "+hedef.ad+" — "+hedef.takim+", "+hedef.ulke+", "+hedef.mevki+", "+hedef.donem+", "+yillar;
     document.getElementById("shareText").textContent=paylasimMetni();
-    fotoGoster(hedef.ad);
+    fotoAc(hedef.ad);
+    ipucuEl.hidden=true;
+    var st=istatKaydet(kazandi, S.tahminler.length);
+    istatCiz(st, kazandi?S.tahminler.length:null);
     resultEl.hidden=false;
     document.querySelector(".countdown").hidden = S.rastgele;
     if(!S.rastgele && !geriSayimBasladi){ geriSayimBasladi=true; geriSayim(); }
@@ -8186,8 +8441,10 @@
     satirCiz(p);
     inputEl.value=""; suggEl.hidden=true;
     hintEl.textContent="Havuzda "+P.length+" futbolcu · kalan hak: "+(MAX-S.tahminler.length);
+    fotoNetle();
     if(p.ad===hedef.ad) bitir(true);
     else if(S.tahminler.length>=MAX) bitir(false);
+    else ipucuKontrol();
   }
 
   function modKur(yeni) {
@@ -8206,6 +8463,8 @@
     boardEl.querySelectorAll(".row:not(.hdr-row)").forEach(function(r){ r.remove(); });
     S.tahminler.forEach(function(p){ satirCiz(p, true); });
 
+    fotoYukle(hedef.ad);
+
     if (S.bitti) {
       guessZone.hidden=true; hintEl.hidden=true;
       bitir(S.tahminler.length && S.tahminler[S.tahminler.length-1].ad===hedef.ad);
@@ -8213,6 +8472,20 @@
       guessZone.hidden=false; hintEl.hidden=false; resultEl.hidden=true;
       inputEl.value=""; suggEl.hidden=true;
       hintEl.textContent="Havuzda "+P.length+" futbolcu · kalan hak: "+(MAX-S.tahminler.length);
+      ipucuEl.hidden=true; ipucuKontrol();
+    }
+  }
+
+  var ipucuEl=document.getElementById("ipucu");
+
+  function bashariAl(ad) {
+    return ad.split(/\s+/).map(function(w){ return w.charAt(0).toLocaleUpperCase("tr")+"."; }).join(" ");
+  }
+
+  function ipucuKontrol() {
+    if(S.tahminler.length>=4 && !S.bitti){
+      ipucuEl.innerHTML = "İpucu: baş harfleri <b>"+bashariAl(hedef.ad)+"</b>";
+      ipucuEl.hidden=false;
     }
   }
 
@@ -8220,12 +8493,22 @@
     boardEl.querySelectorAll(".row:not(.hdr-row)").forEach(function(r){ r.remove(); });
     S.tahminler=[]; S.bitti=false;
     guessZone.hidden=false; hintEl.hidden=false; resultEl.hidden=true;
-    fotoKutu.hidden=true; fotoImg.removeAttribute("src");
+    ipucuEl.hidden=true;
+    fotoYukle(hedef.ad);
     inputEl.value=""; suggEl.hidden=true;
     document.getElementById("puzNo").textContent = S.rastgele ? "RASTGELE" : "#"+(gunNo+1);
     document.getElementById("gunlukSoru").hidden = !S.rastgele;
     hintEl.textContent = "Havuzda "+P.length+" futbolcu · kalan hak: "+MAX;
   }
+
+  document.querySelectorAll(".zBtn button").forEach(function(b){
+    b.addEventListener("click", function(){
+      document.querySelectorAll(".zBtn button").forEach(function(x){
+        x.setAttribute("aria-pressed", x===b ? "true":"false");
+      });
+      zorluk=b.dataset.z;
+    });
+  });
 
   document.getElementById("yeniSoru").addEventListener("click", function(){
     S.rastgele=true;
