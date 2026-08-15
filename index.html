@@ -169,6 +169,16 @@
   .sugg button:hover, .sugg button:focus-visible { background:var(--flood); color:#171104; outline:none; }
   .sugg button:hover .meta, .sugg button:focus-visible .meta { color:rgba(23,17,4,.7); }
 
+  .soru-araclari { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }
+  .ghost {
+    appearance:none; background:transparent; border:1px solid var(--line);
+    color:var(--ink-2); font-family:var(--mono); font-size:11px; letter-spacing:.1em;
+    text-transform:uppercase; padding:11px 16px; border-radius:999px; cursor:pointer; min-height:42px;
+  }
+  .ghost:hover { border-color:var(--flood); color:var(--flood); }
+  .ghost:focus-visible { outline:2px solid var(--flood); outline-offset:2px; }
+  .ghost[hidden] { display:none; }
+
   .result { margin-top:18px; padding:18px; background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--flood); border-radius:3px; }
   .result[hidden] { display:none; }
   .result h3 { margin:0 0 4px; font-size:17px; }
@@ -269,6 +279,11 @@
       <div class="sugg" id="sugg" hidden></div>
     </div>
     <p class="hint" id="hint"></p>
+
+    <div class="soru-araclari">
+      <button type="button" class="ghost" id="yeniSoru">Yeni soru</button>
+      <button type="button" class="ghost" id="gunlukSoru" hidden>Günün sorusuna dön</button>
+    </div>
 
     <div class="result" id="result" hidden>
       <h3 id="resTitle"></h3>
@@ -4650,7 +4665,7 @@
   // Günlük seçim ağırlıklı: 4 günün 3'ü tanınmış isimden gelir.
   var MODLAR = {
     sl:    { ad:"Süper Lig arşivi", liste:P_SL, tohum:11, unlu:300 },
-    dunya: { ad:"Dünya arşivi",     liste:P_D,  tohum:23, unlu:500 }
+    dunya: { ad:"Dünya arşivi",     liste:P_D,  tohum:23, unlu:250 }
   };
 
   var EPOCH=Date.UTC(2026,0,1);
@@ -4672,6 +4687,13 @@
     return a;
   }
 
+  // rastgele soru: 4'te 3 ihtimalle tanınmış katmandan
+  function rastgeleHedef(M) {
+    var n=M.liste.length, a=Math.min(M.unlu,n), b=n-a;
+    if(b>0 && Math.random()<0.25) return M.liste[a + Math.floor(Math.random()*b)];
+    return M.liste[Math.floor(Math.random()*a)];
+  }
+
   function gunlukHedef(M) {
     var n=M.liste.length, a=Math.min(M.unlu,n), b=n-a;
     if(!M._pA){ M._pA=karistir(a, M.tohum); M._pB=b>0?karistir(b, M.tohum+9973):[]; }
@@ -4687,7 +4709,10 @@
   var MAX=6;
 
   // her mod kendi ilerlemesini korur
-  var DURUMLAR = { sl:{tahminler:[],bitti:false}, dunya:{tahminler:[],bitti:false} };
+  var DURUMLAR = {
+    sl:    { tahminler:[], bitti:false, hedef:null, rastgele:false },
+    dunya: { tahminler:[], bitti:false, hedef:null, rastgele:false }
+  };
   var mod="sl", P=P_SL, hedef=null, S=DURUMLAR.sl;
 
   function donemIdx(d){ return DONEMLER.indexOf(d); }
@@ -4739,7 +4764,9 @@
     var skor = S.tahminler.length && S.tahminler[S.tahminler.length-1].ad===hedef.ad
       ? S.tahminler.length+"/"+MAX : "X/"+MAX;
     var etiket = mod==="sl" ? "Süper Lig" : "Dünya";
-    return "DALABALL · "+etiket+" #"+(gunNo+1)+"  "+skor+"\n\n"+satirlar.join("\n");
+    var bas = S.rastgele ? "DALABALL · "+etiket+" (rastgele)  "+skor
+                         : "DALABALL · "+etiket+" #"+(gunNo+1)+"  "+skor;
+    return bas+"\n\n"+satirlar.join("\n");
   }
 
   function geriSayim() {
@@ -4767,7 +4794,8 @@
       "Cevap: "+hedef.ad+" — "+hedef.takim+", "+hedef.ulke+", "+hedef.mevki+", "+hedef.donem+", "+hedef.yas+" yaşında";
     document.getElementById("shareText").textContent=paylasimMetni();
     resultEl.hidden=false;
-    if(!geriSayimBasladi){ geriSayimBasladi=true; geriSayim(); }
+    document.querySelector(".countdown").hidden = S.rastgele;
+    if(!S.rastgele && !geriSayimBasladi){ geriSayimBasladi=true; geriSayim(); }
   }
 
   function tahminEt(p) {
@@ -4785,10 +4813,12 @@
     var M=MODLAR[mod];
     P=M.liste;
     S=DURUMLAR[mod];
-    hedef=gunlukHedef(M);
+    if(!S.hedef) S.hedef=gunlukHedef(M);
+    hedef=S.hedef;
 
     document.getElementById("poolInfo").textContent = M.ad+" · "+P.length+" futbolcu";
-    document.getElementById("puzNo").textContent = "#"+(gunNo+1);
+    document.getElementById("puzNo").textContent = S.rastgele ? "RASTGELE" : "#"+(gunNo+1);
+    document.getElementById("gunlukSoru").hidden = !S.rastgele;
 
     // tahtayı bu modun ilerlemesiyle yeniden çiz
     boardEl.querySelectorAll(".row:not(.hdr-row)").forEach(function(r){ r.remove(); });
@@ -4803,6 +4833,31 @@
       hintEl.textContent="Havuzda "+P.length+" futbolcu · kalan hak: "+(MAX-S.tahminler.length);
     }
   }
+
+  function tahtayiSifirla() {
+    boardEl.querySelectorAll(".row:not(.hdr-row)").forEach(function(r){ r.remove(); });
+    S.tahminler=[]; S.bitti=false;
+    guessZone.hidden=false; hintEl.hidden=false; resultEl.hidden=true;
+    inputEl.value=""; suggEl.hidden=true;
+    document.getElementById("puzNo").textContent = S.rastgele ? "RASTGELE" : "#"+(gunNo+1);
+    document.getElementById("gunlukSoru").hidden = !S.rastgele;
+    hintEl.textContent = "Havuzda "+P.length+" futbolcu · kalan hak: "+MAX;
+  }
+
+  document.getElementById("yeniSoru").addEventListener("click", function(){
+    S.rastgele=true;
+    S.hedef=rastgeleHedef(MODLAR[mod]);
+    hedef=S.hedef;
+    tahtayiSifirla();
+    inputEl.focus();
+  });
+
+  document.getElementById("gunlukSoru").addEventListener("click", function(){
+    S.rastgele=false;
+    S.hedef=gunlukHedef(MODLAR[mod]);
+    hedef=S.hedef;
+    tahtayiSifirla();
+  });
 
   document.querySelectorAll("#modes button").forEach(function(b){
     b.addEventListener("click", function(){
