@@ -957,13 +957,40 @@
   var YIL=new Date().getFullYear();
   [P_SL, P_D].forEach(function(L){ L.forEach(function(p){ p.yas = YIL - p.dogum; }); });
 
+  // Havuzun ilk bloğu iyi bilinen isimler; sonrası kadro derinliği.
+  // Günlük seçim ağırlıklı: 4 günün 3'ü tanınmış isimden gelir.
   var MODLAR = {
-    sl:    { ad:"Süper Lig arşivi", liste:P_SL, tohum:0 },
-    dunya: { ad:"Dünya arşivi",     liste:P_D,  tohum:7 }
+    sl:    { ad:"Süper Lig arşivi", liste:P_SL, tohum:11, unlu:130 },
+    dunya: { ad:"Dünya arşivi",     liste:P_D,  tohum:23, unlu:P_D.length }
   };
 
   var EPOCH=Date.UTC(2026,0,1);
   var gunNo=Math.floor((Date.now()-EPOCH)/86400000);
+
+  // sabit tohumlu karıştırma — sıra listedeki yazım sırasını izlemesin
+  function prng(seed) {
+    return function () {
+      seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+      var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function karistir(n, tohum) {
+    var a=[], i, j, tmp, r=prng(tohum);
+    for(i=0;i<n;i++) a.push(i);
+    for(i=n-1;i>0;i--){ j=Math.floor(r()*(i+1)); tmp=a[i]; a[i]=a[j]; a[j]=tmp; }
+    return a;
+  }
+
+  function gunlukHedef(M) {
+    var n=M.liste.length, a=Math.min(M.unlu,n), b=n-a;
+    if(!M._pA){ M._pA=karistir(a, M.tohum); M._pB=b>0?karistir(b, M.tohum+9973):[]; }
+    var bGun = b>0 ? Math.floor(gunNo/4) : 0;
+    var aGun = gunNo - bGun;
+    if(b>0 && gunNo%4===3) return M.liste[a + M._pB[((bGun%b)+b)%b]];
+    return M.liste[M._pA[((aGun%a)+a)%a]];
+  }
 
   var boardEl=document.getElementById("board"), inputEl=document.getElementById("guess"),
       suggEl=document.getElementById("sugg"), hintEl=document.getElementById("hint"),
@@ -1069,7 +1096,7 @@
     var M=MODLAR[mod];
     P=M.liste;
     S=DURUMLAR[mod];
-    hedef=P[(((gunNo+M.tohum) % P.length)+P.length) % P.length];
+    hedef=gunlukHedef(M);
 
     document.getElementById("poolInfo").textContent = M.ad+" · "+P.length+" futbolcu";
     document.getElementById("puzNo").textContent = "#"+(gunNo+1);
